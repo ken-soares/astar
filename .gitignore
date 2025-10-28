@@ -1,0 +1,8 @@
+*.pdf
+*.log
+*.synctex
+*.gz
+*.toc
+*.aux
+*.out
+src/__pycache__
