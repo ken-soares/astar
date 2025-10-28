@@ -14,8 +14,8 @@ def draw_board(window):
     board = Board(NB_CELLS)
     board.create_grid()
 
-    for i in range(len(board.grid)):
-        for j in range(len(board.grid)):
+    for i in range(board.size):
+        for j in range(board.size):
             if board.grid[i][j].is_goal:
                 pygame.draw.rect(window, RED, (CELL_SIZE*i,
                                                CELL_SIZE*j,
