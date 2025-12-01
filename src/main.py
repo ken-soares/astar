@@ -1,50 +1,86 @@
 #!/usr/bin/env python3
+from random import randint
+import pygame as pg
 
-import pygame
+import consts as c
+import astar
 from board import Board
+    
+def run(window : pg.Surface):
+    # Initialize board
+    board = Board(c.NB_CELLS)
+    board.create_grid("src/board.txt")
 
-CELL_SIZE = 20
-NB_CELLS = 16
-WINDOW_SIZE = CELL_SIZE * NB_CELLS
-
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-
-def draw_board(window):
-    board = Board(NB_CELLS)
-    board.create_grid()
-
-    for i in range(board.size):
-        for j in range(board.size):
-            if board.grid[i][j].is_goal:
-                pygame.draw.rect(window, RED, (CELL_SIZE*i,
-                                               CELL_SIZE*j,
-                                               CELL_SIZE,
-                                               CELL_SIZE))
-            else:
-                pygame.draw.rect(window, WHITE, (CELL_SIZE*i,
-                                                 CELL_SIZE*j,
-                                                 CELL_SIZE,
-                                                 CELL_SIZE))
-    pygame.display.flip()
-
-def run():
     running = True
 
+    # Tmp variables for astar testint
+    search = False
+    dest = [0, 0]  
+    src = [0, 0]
+    path = []
+
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        # Update game logic here
+
+        # IMPORTANT !!!
+        # The following part just tests the A* algorithm
+        # The latter is ran once as we suppose nothing moves (collisions for instance) while the player is moving
+        # Thus it is assumed that the source is static during the search
+        if not search:
+            dest[0] = randint(0, board.size - 1)
+            dest[1] = randint(0, board.size - 1)
+
+            src[0] = randint(0, board.size - 1)
+            src[1] = randint(0, board.size - 1)
+
+            board.clear_grid()
+            board.clear_goal()
+            board.set_goal(dest[0], dest[1])
+            board.set_cell_value(src[0], src[1], 1)
+
+            path = astar.astar(board, src, dest)
+
+            search = True
+        else:
+            if not path:
+                search = False
+            else:
+                pos = path.pop()
+                board.set_cell_value(pos[0], pos[1], 1)
+
+
+        # Rendering and Updating display
+        board.draw(window)
+        pg.display.flip()
+
+        # Handle events
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
                 running = False
 
+        # Sleep time
+        pg.time.delay(200)
+        
+
 def close_game():
-    pygame.display.quit()
-    pygame.quit()
+    pg.display.quit()
+    pg.quit()
     quit()
 
-if __name__ == "__main__":
-    pygame.init()
-    window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
-    pygame.display.set_caption("A*")
-    draw_board(window)
-    run()
+def init():
+    pg.init()
+    
+    window = pg.display.set_mode((c.WINDOW_SIZE, c.WINDOW_SIZE))
+    pg.display.set_caption(c.WINDOW_TITLE)
+
+    return window
+
+def main():
+    window = init()
+
+    run(window)
+
     close_game()
+
+if __name__ == "__main__":
+    main()
