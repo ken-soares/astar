@@ -21,3 +21,12 @@ COL_LEFT = 1
 COL_RIGHT = 2
 COL_UP = 4
 COL_DOWN = 8
+
+# Player moves
+MOVE_UP = 1
+MOVE_DOWN = 2
+MOVE_LEFT = 3
+MOVE_RIGHT = 4
+
+# Player decision time (in seconds)
+DECISION_TIME = 30
