@@ -5,10 +5,7 @@ import pygame as pg
 import consts as c
 import astar
 from board import Board
-
 from player import Player
-
-from random import randint
 
 def are_coordinates_unique(coords_list):
     seen = set()

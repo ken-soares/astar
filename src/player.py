@@ -1,15 +1,12 @@
-import pygame
+import pygame as pg
 
 import consts as c
 
 class Player():
-
-
     def __init__(self):
         self.timer = c.DECISION_TIME
         self.chosen_pawn = 1
         self.move_count = 0
-    
     
     def reset_timer(self):
         self.timer = c.DECISION_TIME
@@ -18,28 +15,28 @@ class Player():
     def play(self, event, board):
         initial_position = board.get_pawn_position(self.chosen_pawn)
         
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
                 board.reset_to_initial()
                 self.move_count = 0
                 
-            elif event.key == pygame.K_UP:
+            elif event.key == pg.K_UP:
                 if board.move_pawn(c.MOVE_UP, self.chosen_pawn):
                     self.move_count += 1
                     
-            elif event.key == pygame.K_DOWN:
+            elif event.key == pg.K_DOWN:
                 if board.move_pawn(c.MOVE_DOWN, self.chosen_pawn):
                     self.move_count += 1
                     
-            elif event.key == pygame.K_LEFT:
+            elif event.key == pg.K_LEFT:
                 if board.move_pawn(c.MOVE_LEFT, self.chosen_pawn):
                     self.move_count += 1
                     
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pg.K_RIGHT:
                 if board.move_pawn(c.MOVE_RIGHT, self.chosen_pawn):
                     self.move_count += 1
 
-            elif event.key == pygame.K_TAB:
+            elif event.key == pg.K_TAB:
                 self.chosen_pawn = self.chosen_pawn % 3 + 1
 
     def get_move_count(self):
