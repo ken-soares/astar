@@ -1,5 +1,5 @@
 # Size definitions
-CELL_SIZE = 20          # Must be greater than 4 to display properly
+CELL_SIZE = 40          # Must be greater than 4 to display properly
 NB_CELLS = 16
 
 # Window constants
@@ -16,6 +16,17 @@ FUCHSIA = (255, 0, 255)
 CYAN = (0, 255, 255)
 WHITE = (255, 255, 255)
 
+COLOR_NAME_MAP = {
+    BLACK: "Black",
+    RED: "Red",
+    GREEN: "Green",
+    BLUE: "Blue",
+    YELLOW: "Yellow",
+    FUCHSIA: "Fuchsia",
+    CYAN: "Cyan",
+    WHITE: "White"
+}
+
 # Cell collisions masks
 COL_LEFT = 1
 COL_RIGHT = 2
@@ -30,3 +41,13 @@ MOVE_RIGHT = 4
 
 # Player decision time (in seconds)
 DECISION_TIME = 30
+
+# Pawn colors mapping
+PAWN_GOAL = 1
+PAWN_COLORS = {
+    1: GREEN,
+    2: BLUE,
+    3: FUCHSIA
+}
+PAWN_NUMBER = 3
+PAWN_SIZE = CELL_SIZE // 2.5

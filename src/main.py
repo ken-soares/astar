@@ -7,6 +7,7 @@ import astar
 from board import Board
 from player import Player
 
+## TODO: Move these functions to another file like utils.py
 def are_coordinates_unique(coords_list):
     seen = set()
     for coord in coords_list:
@@ -34,10 +35,10 @@ def generate_unique_coordinates(board, num_coordinates):
         print(f"Warning: Could not generate {num_coordinates} unique coordinates on a {board.size}x{board.size} board")
     
     return coordinates
-
+## END OF REGION
     
 def run(window : pg.Surface):
-
+    # Initialize clock and timer event
     TIMER_EVENT = pg.USEREVENT
     clock = pg.time.Clock()
     
@@ -45,13 +46,15 @@ def run(window : pg.Surface):
     board = Board(c.NB_CELLS)
     board.create_grid("src/board.txt")
     
+    # Initialize player
     player = Player()
+
+    # Initialize font
     font = pg.font.SysFont('Consolas', 20)
 
     running = True
 
-    # Tmp variables for astar testint
-    search = False
+    # TODO: THIS MUST BE MOVED INTO ANOTHER FUNCTION
     dest = [0, 0]
     src1 = [0, 0]
     src2 = [0, 0]
@@ -72,43 +75,16 @@ def run(window : pg.Surface):
         board.set_cell_value(src3[0], src3[1], 3)
         
         board.set_goal(dest[0], dest[1], goal_pawn_id)
+    # END OF REGION
 
     # save board state so we can rollback on our turn if we find another path
     board.save_initial_state()
 
     while running:
         # Update game logic here
-
-        # IMPORTANT !!!
-        # The following part just tests the A* algorithm
-        # The latter is ran once as we suppose nothing moves (collisions for instance) while the player is moving
-        # Thus it is assumed that the source is static during the search
-        #if not search:
-        #    dest[0] = randint(0, board.size - 1)
-        #    dest[1] = randint(0, board.size - 1)
-
-        #    src[0] = randint(0, board.size - 1)
-        #    src[1] = randint(0, board.size - 1)
-
-        #    board.clear_grid()
-        #    board.clear_goal()
-
-        #    path = astar.astar(board, src, dest)
-
-        #    search = True
-        #else:
-            #if not path:
-            #    search = False
-            #else:
-            #    pos = path.pop()
-            #    board.set_cell_value(pos[0], pos[1], 1)
-
-
-        # Rendering and Updating display
-
-        # Handle events
         for event in pg.event.get():
             player.play(event, board)
+            
             if event.type == pg.QUIT:
                 running = False
             elif event.type == TIMER_EVENT:
@@ -116,21 +92,32 @@ def run(window : pg.Surface):
                     player.decrement_timer()
                 else:
                     pg.time.set_timer(TIMER_EVENT, 0)
+                    print("Timer expired!")
+        
+         # Rendering and Updating display
+        window.fill(c.BLACK) # Clear the window with black color
 
-        # fps limit at 60
-        time_text = font.render("time left: " + str(player.get_timer()).rjust(3), True, (255, 255, 255))
-        move_count_text = font.render("move count: " + str(player.get_move_count()), True, (255,255,255))
-        chosen_pawn_text = font.render("moving pawn: " + board.get_pawn_colors()[player.get_chosen_pawn() - 1], True, (255,255,255))
-        window.fill((0, 0, 0))
+        board.draw(window)
+
+        # TODO: THIS MUST BE MOVED INTO ANTOTHER FUNCTION
+        remaining_time = player.get_timer()
+        move_count = player.get_move_count()
+        chosen_pawn = player.get_chosen_pawn()
+
+        time_text = font.render("time left: " + str(remaining_time).rjust(3), True, c.WHITE)
+        move_count_text = font.render("move count: " + str(move_count), True, c.WHITE)
+        chosen_pawn_text = font.render("moving pawn: " + c.COLOR_NAME_MAP[c.PAWN_COLORS[chosen_pawn]], True, c.WHITE)
+
         window.blit(time_text, (10, c.WINDOW_SIZE + 10))
         window.blit(move_count_text, (10, c.WINDOW_SIZE + 35))
         window.blit(chosen_pawn_text, (10, c.WINDOW_SIZE + 55))
-        
-        board.draw(window)
+        # END OF REGION
+
         pg.display.flip()
+
+        # Sleep to maintain 60 FPS
         clock.tick(60)
         
-
 def close_game():
     pg.display.quit()
     pg.quit()
@@ -142,6 +129,7 @@ def init():
     window = pg.display.set_mode((c.WINDOW_SIZE, c.WINDOW_SIZE + 150))
     pg.display.set_caption(c.WINDOW_TITLE)
     pg.time.set_timer(pg.USEREVENT, 1000) # creates an event that counts seconds
+
     return window
 
 def main():

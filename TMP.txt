@@ -1,0 +1,23 @@
+# IMPORTANT !!!
+# The following part just tests the A* algorithm
+# The latter is ran once as we suppose nothing moves (collisions for instance) while the player is moving
+# Thus it is assumed that the source is static during the search
+#if not search:
+#    dest[0] = randint(0, board.size - 1)
+#    dest[1] = randint(0, board.size - 1)
+
+#    src[0] = randint(0, board.size - 1)
+#    src[1] = randint(0, board.size - 1)
+
+#    board.clear_grid()
+#    board.clear_goal()
+
+#    path = astar.astar(board, src, dest)
+
+#    search = True
+#else:
+    #if not path:
+    #    search = False
+    #else:
+    #    pos = path.pop()
+    #    board.set_cell_value(pos[0], pos[1], 1)
