@@ -25,9 +25,10 @@ def generate_unique_coordinates(board, num_coordinates):
         x = randint(0, board.size - 1)
         y = randint(0, board.size - 1)
         coord = (x, y)
-        
+
         if coord not in coordinates:
-            coordinates.append(coord)
+            if coord not in [(key, c1, c2) for key, tuples in c.PAWN_GOAL_COORDS.items() for c1, c2 in tuples]:
+                coordinates.append(coord)
         
         attempts += 1
     
@@ -55,26 +56,30 @@ def run(window : pg.Surface):
     running = True
 
     # TODO: THIS MUST BE MOVED INTO ANOTHER FUNCTION
-    dest = [0, 0]
     src1 = [0, 0]
     src2 = [0, 0]
     src3 = [0, 0]
+    src4 = [0, 0]
 
     all_coords = generate_unique_coordinates(board, 4)
 
     if len(all_coords) >= 4:
-        dest[0], dest[1] = all_coords[0]
-        src1[0], src1[1] = all_coords[1]
-        src2[0], src2[1] = all_coords[2]
-        src3[0], src3[1] = all_coords[3]
+        src1[0], src1[1] = all_coords[0]
+        src2[0], src2[1] = all_coords[1]
+        src3[0], src3[1] = all_coords[2]
+        src4[0], src4[1] = all_coords[3]
         
-        goal_pawn_id = randint(1, 3)
-        
+        goal_pawn_id = randint(1, 4)
+        goal_coords_id = randint(0,3)
+
+        dest_line, dest_col = c.PAWN_GOAL_COORDS[goal_pawn_id][goal_coords_id]
+
         board.set_cell_value(src1[0], src1[1], 1)
         board.set_cell_value(src2[0], src2[1], 2)
         board.set_cell_value(src3[0], src3[1], 3)
+        board.set_cell_value(src4[0], src4[1], 4)
         
-        board.set_goal(dest[0], dest[1], goal_pawn_id)
+        board.set_goal(dest_line, dest_col, goal_pawn_id)
     # END OF REGION
 
     # save board state so we can rollback on our turn if we find another path

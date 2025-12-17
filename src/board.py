@@ -49,16 +49,18 @@ class Cell:
             pg.draw.circle(window, c.BLACK, (center_x, center_y), pawn_size)
             pg.draw.circle(window, col, (center_x, center_y), pawn_size - 1)
         
-        # Draw red cross if it's a goal
+        # Draw cross of the pawn color if it's a goal
         if self.is_goal and self.goal_pawn_id > 0:
-            # Draw red cross
+            # Draw pawn colored cross
             cross_size = size // 3
+
+            cross_color : tuple[int, int, int] = c.PAWN_COLORS[self.goal_pawn_id]
 
             pg.draw.line(window, c.BLACK, (center_x - cross_size, center_y), (center_x + cross_size, center_y), 4)
             pg.draw.line(window, c.BLACK, (center_x, center_y - cross_size), (center_x, center_y + cross_size), 4)
 
-            pg.draw.line(window, c.RED, (center_x - cross_size + 1, center_y), (center_x + cross_size - 1, center_y), 2)
-            pg.draw.line(window, c.RED, (center_x, center_y - cross_size + 1), (center_x, center_y + cross_size - 1), 2)
+            pg.draw.line(window, cross_color, (center_x - cross_size + 1, center_y), (center_x + cross_size - 1, center_y), 2)
+            pg.draw.line(window, cross_color, (center_x, center_y - cross_size + 1), (center_x, center_y + cross_size - 1), 2)
 
 class Board:
     def __init__(self, size: int):
@@ -224,3 +226,16 @@ class Board:
         for y in range(self.size):
             for x in range(self.size):
                 self.grid[y][x].draw(window, x, y)
+        self.color_possible_goals(window)
+
+    def color_possible_goals(self, window: pg.Surface) -> None:
+
+        for col_id, col_coords in c.PAWN_GOAL_COORDS.items():
+            for coord in col_coords:
+                x : int = coord[0]
+                y : int = coord[1]
+
+                center_x = int(round(c.CELL_SIZE * (x + 0.5)))
+                center_y = int(round(c.CELL_SIZE * (y + 0.5)))
+
+                pg.draw.circle(window, c.PAWN_COLORS[col_id], (center_x, center_y), (c.CELL_SIZE // 2) - 7)

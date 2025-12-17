@@ -42,12 +42,27 @@ MOVE_RIGHT = 4
 # Player decision time (in seconds)
 DECISION_TIME = 30
 
+# Pawn ids
+RED_ID = 1
+GREEN_ID = 2
+BLUE_ID = 3
+YELLOW_ID = 4
+
 # Pawn colors mapping
 PAWN_GOAL = 1
 PAWN_COLORS = {
-    1: GREEN,
-    2: BLUE,
-    3: FUCHSIA
+    RED_ID: RED,
+    GREEN_ID: GREEN,
+    BLUE_ID: BLUE,
+    YELLOW_ID: YELLOW
 }
-PAWN_NUMBER = 3
+
+# Pawn possible goal coordinates (for 0-15 square grid)
+PAWN_GOAL_COORDS = {
+    RED_ID: [(2,5),(2,14),(11,14),(14,1)],
+    GREEN_ID: [(1,10),(5,4),(13,6),(14,13)],
+    BLUE_ID: [(6,1),(6,13),(11,2),(12,9)],
+    YELLOW_ID: [(1,3),(4,9),(10,7),(9,12)]
+}
+PAWN_NUMBER = 4
 PAWN_SIZE = CELL_SIZE // 2.5
