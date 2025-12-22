@@ -11,9 +11,13 @@ class Cell:
                        collide_up: bool,
                        collide_down: bool):
 
-        self.value = 0                      # Pawn ID (0 = empty, 1-3 = pawn)
-        self.is_goal = is_goal              # FIXME: redundant with goal_pawn_id?
-        self.goal_pawn_id = goal_pawn_id    # Which pawn this goal is for (0 = no goal, 1-3 = pawn)
+        self.value = 0                      # Pawn ID (0 = empty, 1-4 = pawn)
+        self.is_goal = is_goal
+        self.goal_pawn_id = goal_pawn_id
+
+        if is_goal and goal_pawn_id == 0:
+            self.goal_pawn_id = 1              # FIXME: redundant with goal_pawn_id?
+            # Which pawn this goal is for (0 = no goal, 1-3 = pawn)
         self.collide_left = collide_left
         self.collide_right = collide_right
         self.collide_up = collide_up
@@ -89,16 +93,23 @@ class Board:
         except IOError:
             print("Error: File not found.")
 
-    #def clear_grid(self) -> None:
-        #for y in range(self.size):
-            #for x in range(self.size):
-                #self.grid[y][x].value = 0
+    def clear_pawns(self) -> None:
+        for y in range(self.size):
+            for x in range(self.size):
+                self.grid[y][x].value = 0
 
-    #def clear_goal(self) -> None:
-        #for y in range(self.size):
-            #for x in range(self.size):
-                #self.grid[y][x].is_goal = False
-                #self.grid[y][x].goal_pawn_id = 0
+    def clear_goal(self) -> None:
+        for y in range(self.size):
+            for x in range(self.size):
+                self.grid[y][x].is_goal = False
+                self.grid[y][x].goal_pawn_id = 0
+
+    def get_goal(self) -> tuple[int,int]:
+        for y in range(self.size):
+            for x in range(self.size):
+                if self.grid[y][x].is_goal:
+                    return (x, y)
+        return -1
 
     def set_goal(self, x: int, y: int, pawn_id: int) -> None:
         self.grid[y][x].is_goal = True
