@@ -1,36 +1,95 @@
-\documentclass[a4paper,11pt,titlepage]{article}
-
+\documentclass[paper=a4,fontsize=12pt,titlepage]{scrartcl}
+%-----------------------------------------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[english]{babel}
-\usepackage{color}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+%-----------------------------------------------
+\usepackage{amsmath,amssymb,mathtools,stmaryrd}
+%-----------------------------------------------
 \usepackage{xcolor}
 \usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\usepackage{stmaryrd}
-\usepackage[hmargin={2.5cm,2.5cm},top=2.5cm,bottom=2.5cm]{geometry}
-\usepackage{lmodern}
-\usepackage[ruled,lined]{algorithm2e}
-\usepackage{listings}
 \usepackage{tikz, pgf}
-
-\usepackage[colorlinks=true,breaklinks=true,linkcolor=blue,filecolor=magenta,urlcolor=cyan,pdftitle={Project},pdfsubject={Project}]{hyperref}
+\usepackage{float}
+\usepackage{adjustbox}
 
 \usetikzlibrary{arrows,shapes,positioning}
+%-----------------------------------------------
+\usepackage[ruled,lined]{algorithm2e}
+\usepackage{listings}
+%-----------------------------------------------
+\usepackage[
+	colorlinks=true,
+	breaklinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=cyan,
+	pdftitle={Project},
+	pdfsubject={Project}
+]{hyperref}
+%-----------------------------------------------
+\usepackage{typearea}
 
-\title{IA41 Project Template}
-\author{blah}
+\KOMAoptions{
+	DIV=12,
+	BCOR=0mm,
+	abstract=true,
+	pagesize=auto
+}
+\recalctypearea
+%-----------------------------------------------
+\newenvironment{AThreeLandscape}{%
+	\clearpage
+	\KOMAoptions{paper=a3, paper=landscape}%
+	\recalctypearea%
+	\thispagestyle{plain}%
+}{%
+	\clearpage
+	\KOMAoptions{paper=a4, paper=portrait}%
+	\recalctypearea%
+}
+%-----------------------------------------------
+\newenvironment{AFourLandscape}{%
+	\clearpage
+	\KOMAoptions{paper=a4, paper=landscape}%
+	\recalctypearea%
+	\thispagestyle{plain}%
+}{%
+	\clearpage
+	\KOMAoptions{paper=a4, paper=portrait}%
+	\recalctypearea%
+}
+%-----------------------------------------------
+\sloppy
+\hyphenpenalty=10000
+%-----------------------------------------------
+\title{
+	\Huge Ricochet Robot\\
+	\Large Projet IA41
+}
 
+\author{
+	Noa \textsc{FOUICH}\\
+	Corentin \textsc{HAUTEFAYE}\\
+	William \textsc{LE GALLOU}\\
+	Kenneth \textsc{SOARES}
+}
 
+\date{Janvier 2026}
+%-----------------------------------------------
 \begin{document}
 	
 	\maketitle
-	\newpage
+	
+	\renewcommand*{\abstractname}{Introduction}
+	\begin{abstract}
+		\thispagestyle{plain}
+		blah
+	\end{abstract}
 	
 	\tableofcontents
-	\newpage
+	\clearpage
+%-----------------------------------------------
 	
 	\section{Introduction}
 	
@@ -41,30 +100,5 @@
 	\verb|azerxdrsdr5|
 	
 	
-	\begin{center}
-		\begin{tikzpicture}
-			\node[draw, circle] (S0) at (-1,0) {$S_0$} ;
-			\node[draw, circle] (S1) at (2,2) {$S_1$} ;
-			\node[draw, circle] (S2) at (2,-2) {$S_2$} ;
-			\node[draw, circle] (S3) at (-2,-2) {$S_3$} ;
-			\node[draw, circle] (Err) at (2,0) {$Err$} ;
-			
-			\draw (S0) to[bend right=75](-2,1);
-			\draw[->,>=latex](-2,1) to[bend right=75](S0);
-			
-			\draw[->,>=latex] (S0) edge[bend left] (S1) ;
-			\draw[->,>=latex] (S0) edge[bend right] (S2) ;
-			\draw[->,>=latex] (S0) edge (S3) ;
-			
-			\draw[->,>=latex] (S1) edge[bend left] (S0) ;
-			\draw (S1) to[bend right=75](3,3);
-			\draw[->,>=latex](3,3) to[bend right=75](S1);
-			
-			\draw[->,>=latex] (S2) edge[bend right] (S0) ;
-			\draw[->,>=latex] (S2) edge[bend right] (Err) ;
-			
-			\draw[->,>=latex] (Err) edge (S0) ;
-		\end{tikzpicture}
-	\end{center}
 	
 \end{document}
