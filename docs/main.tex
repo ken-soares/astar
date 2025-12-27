@@ -5,7 +5,7 @@
 \usepackage[french]{babel}
 \usepackage{lmodern}
 %-----------------------------------------------
-\usepackage{amsmath,amssymb,mathtools,stmaryrd}
+\usepackage{amsmath,amssymb,amsthm,mathtools,stmaryrd}
 %-----------------------------------------------
 \usepackage{xcolor}
 \usepackage{graphicx}
@@ -60,11 +60,48 @@
 	\recalctypearea%
 }
 %-----------------------------------------------
+\newtheorem{theorem}{Théorème}
+\newtheorem{axiom}{Axiome}
+
+\theoremstyle{definition}
+\newtheorem{mydef}{Définition}
+\newtheorem{mycor}{Corollaire}
+
+\theoremstyle{remark}
+\newtheorem{myrem}{Remarque}
+
+\theoremstyle{plain}
+\newtheorem{myprop}{Proposition}
+
+\DeclareMathOperator{\Ima}{Im}
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Card}{Card}
+\DeclareMathOperator{\Sp}{Sp}
+\DeclareMathOperator{\Inf}{Inf}
+\DeclareMathOperator{\Vect}{Vect}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Mat}{\mathcal{M}at}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+%-----------------------------------------------
 \sloppy
 \hyphenpenalty=10000
 %-----------------------------------------------
 \title{
-	\Huge Ricochet Robot\\
+	\Huge Rasende Roboter\\
 	\Large Projet IA41
 }
 
@@ -84,21 +121,162 @@
 	\renewcommand*{\abstractname}{Introduction}
 	\begin{abstract}
 		\thispagestyle{plain}
-		blah
+		Dans le cadre de l'UE IA41 (\textit{Semestre A25}), nous avons réalisé une implémentation du jeu de décision \textit{Rasende Roboter}. L'objectif de ce projet est
+		de programmer un système capable de fournir une solution aux configurations proposées, autrement dit de permettre à un utilisateur de jouer des parties contre l'ordinateur.
 	\end{abstract}
 	
 	\tableofcontents
 	\clearpage
 %-----------------------------------------------
+	\section{Présentation générale}
+	\subsection{Rappel de l'énoncé du sujet}
 	
-	\section{Introduction}
+	\textbf{INSERT TEXT HERE}
 	
-	\begin{align*}
-		x = 2 &\implies x²=4 \text{ dtdtdtdt}
-	\end{align*}
+	\subsection{Conventions}
 	
-	\verb|azerxdrsdr5|
+	\textbf{INSERT TEXT HERE}
 	
+	\subsection{Outils utilisés}
 	
+	Pour réaliser ce projet, les outils suivants ont été utilisés:
+	\begin{itemize}
+		\item \textbf{Python 3} 
+		\item \textbf{PyGame} pour l'interface graphique
+		\item \textbf{Git} et \textbf{GitHub} pour le contrôle des versions
+		\item \textbf{\LaTeX} pour la rédaction du rapport
+	\end{itemize}
+%-----------------------------------------------
+	\newpage
+	\section{Spécification du problème}
 	
+	Dans cette section, on cherche à généraliser et formaliser une partie du jeu. 
+	
+	\subsection{Notations}
+	
+	Soit $k\in\mathbb{N}\backslash\{0;1\}$. Soit $n\in\mathbb{N}$ tel que $n\ge k+1$. Afin de représenter le plateau de jeu, on définit les notations suivantes:
+	\begin{itemize}
+		\item $B=\llbracket 1;n\rrbracket^2$ une grille de $n\times n$ cases.
+		\item $R=\{r_i\;|\; i\in\llbracket 1;k\rrbracket\}$ l'ensemble des $k$ robots où pour tout $i\in\llbracket 1;k\rrbracket, r_i=(x_i,y_i)\in B$.
+		\item $C=\left\{\{(x,y),(x',y')\}\;\Big|\; \left\{\begin{array}{ll}
+					(x,y) &\in B \\
+					(x',y') &\in B \\
+					\abs{x-x'}+\abs{y-y'} &=1
+				\end{array}\right.\right\}$ l'ensemble des collisions entre deux cases de $B$.
+		\item $D=\left\{(1,0),(-1,0),(0,1),(0,-1)\right\}$ l'ensemble des directions cardinales.
+	\end{itemize}
+	
+	\subsection{Espace d'états}
+	
+	\begin{mydef}
+		On définit un \textit{état du jeu} par tout $k$-uplet de $B$.
+		L'ensemble de tous les états possibles, noté $\mathcal{S}$, correspond à l'ensemble des positions occupées par les $k$ robots, d'où $\mathcal{S}=B^k$.
+	\end{mydef}
+	
+	Il est important de noter que de ce fait, on obtient $\Card(\mathcal{S})=n^{2k}$. Or, la définition proposée n'impose pas à un état d'être valide. En effet, il est impossible que deux robots occupent la même case, d'où:
+	
+	\begin{mydef}
+		On définit \textit{l'ensemble des états valides}, ou \textit{espace d'états}, et on note $\mathcal{S}_v=\left\{(r_1,\ldots,r_k)\in B^k\;\Big|\;\forall(i,j)\in\llbracket 1;k\rrbracket^2, (i\ne j)\implies (r_i\ne r_j)\right\}$. Un élément de $\mathcal{S}_v$ est dit \textit{valide}.
+	\end{mydef}
+	
+	L'inclusion $\mathcal{S}_v\subset\mathcal{S}$ est ainsi triviale.
+	
+	\begin{myprop}
+		On a $\Card\left(\mathcal{S}_v\right)=\frac{(n^2)!}{(n^2-k)!}$.
+	\end{myprop}
+	
+	\begin{proof}
+		On cherche le nombre de $k$-uplets injectifs $(r_1,\ldots,r_k):\llbracket 1;k\rrbracket\rightarrow B$. Formellement, chaque fonction $f:\llbracket 1;k\rrbracket\rightarrow B$ qui est injective correspond à un état valide. Or, le nombre de fonctions injectives de $\llbracket 1;k\rrbracket$ dans $B$ est exactement le nombre d'arrangements de $k$ parmi $n^2$ éléments.
+		
+		D'où, la conclusion.
+	\end{proof}
+	
+	\begin{myrem}
+		On obtient ainsi le fait que l'espace d'états croît très rapidement en fonction de $n$ et $k$.
+	\end{myrem}
+	
+	\subsection{Fonction de transition}
+	
+	\begin{mydef}
+		On définit la \textit{fonction de transition} pour passer d'un état valide à un autre, d'où:
+		
+		\[
+			\begin{array}{lll}
+				\delta :& \mathcal{S}_v\times\llbracket 1;k\rrbracket\times D &\rightarrow\mathcal{S}_v \\
+				&((r_1,\ldots,r_k),i,d)&\mapsto (r_1,\ldots,r_i+dt,\ldots,r_k)
+			\end{array}
+		\]
+		
+		avec $t=\min \Big\{ s \in \mathbb{N}^* \;\Big|\; \begin{array}{ll}
+			&(x_i,y_i) + d(s+1) \in R \\
+			\text{ou} &\{ (x_i,y_i) + ds, (x_i,y_i) + d(s+1) \} \in C 
+		\end{array}\Big\}$
+	\end{mydef}
+	
+	\begin{myrem}
+		Comme pour le passage d'un état à un autre, il est facile de trouver les variables $i$ et $d$, il convient de simplifier l'écriture de $\delta(S,i,d)$ par $\delta(S)$.
+	\end{myrem}
+	
+	\begin{mydef}
+		Soit $t\in\llbracket 1;k\rrbracket$ et $S_0=(r_1,\ldots,r_k)\in\mathcal{S}_v$ l'état initial. Soit $g\in B$ une case. On dit que $g$ est \textit{atteignable} depuis $S_0$ par $r_t$ \underline{ssi} il existe une suite finie de $m+1\in\mathbb{N}$ états $(S_i)_{i\in\llbracket 0;m\rrbracket}$ telle que pour tout $i\in\llbracket 1;m\rrbracket, \delta(S_{i-1})=S_i$ et $(S_m)_t=g$ où $(S_m)_t$ désigne la position du $t$-ième robot dans l'état considéré.
+	\end{mydef}
+	
+	On définit ainsi l'ensemble $G$ des cases objectifs jouables par:
+	\[
+		G=\left\{g\in B \;|\;\exists m\in\mathbb{N}, \exists (S_i)_{i\in\llbracket 0;m\rrbracket}, \left\{\begin{array}{ll}
+			\forall i\in\llbracket 1;m\rrbracket, &\delta(S_{i-1})=S_i\\
+			(S_m)_t=g
+		\end{array}\right.\right\}
+	\]
+	
+	\begin{mydef}
+		On appelle \textit{configuration de jeu} tout sextuplet
+		\[
+		(k, n, t, C, R, g)
+		\]
+		où :
+		\begin{itemize}
+			\item $k$ est le nombre de robots,
+			\item $n$ est la taille du plateau,
+			\item $t\in\llbracket 1;k\rrbracket$ est l'indice du robot cible,
+			\item $R$ est l'ensemble des positions initiales des robots,
+			\item $C$ est l'ensemble des obstacles entre cases adjacentes,
+			\item $g \in G$ est la case objectif du robot cible.
+		\end{itemize}
+	\end{mydef}
+	
+%-----------------------------------------------
+	\newpage
+	\section{Analyse du problème}
+	\subsection{Nature et caractéristiques du problème}
+	\subsection{Contraintes et difficultés}
+	\subsection{Structures de données envisageables}
+	\subsection{Approches algorithmiques possibles}
+	\subsubsection{Recherche non informée}
+	\subsubsection{Recherche informée}
+	\subsubsection{Critères de choix d'une approche}
+%-----------------------------------------------
+	\newpage
+	\section{Traitement du problème}
+	\subsection{Principe général de la solution retenue}
+	\subsection{Algorithmes implémentés}
+	\subsubsection{Parcours en largeur d'abord}
+	\subsubsection{Algorithme A*}
+	\subsubsection{Heuristique utilisée}
+	\subsection{Organisation du programme}
+%-----------------------------------------------
+	\newpage
+	\section{Études de cas \& Résultats}
+	\subsection{Description des situations testées}
+	\subsection{Résultats obtenus}
+	\subsection{Interprétation des résultats}
+%-----------------------------------------------	
+	\newpage	
+	\section{Retour d'expérience}
+	\subsection{Organisation}
+	\subsection{Difficultés rencontrées}
+	\subsection{Suggestions d'amélioration}
+%-----------------------------------------------
+	\newpage	
+	\section{Conclusion}
 \end{document}
