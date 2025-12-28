@@ -150,19 +150,19 @@
 	\newpage
 	\section{Spécification du problème}
 	
-	Dans cette section, on cherche à généraliser et formaliser une partie du jeu. 
+	Dans cette section, on cherche à généraliser et formaliser une partie de jeu. 
 	
 	\subsection{Notations}
 	
 	Soit $k\in\mathbb{N}\backslash\{0;1\}$. Soit $n\in\mathbb{N}$ tel que $n\ge k+1$. Afin de représenter le plateau de jeu, on définit les notations suivantes:
 	\begin{itemize}
 		\item $B=\llbracket 1;n\rrbracket^2$ une grille de $n\times n$ cases.
-		\item $R=\{r_i\;|\; i\in\llbracket 1;k\rrbracket\}$ l'ensemble des $k$ robots où pour tout $i\in\llbracket 1;k\rrbracket, r_i=(x_i,y_i)\in B$.
+		\item Pour tout $i\in\llbracket 1;k\rrbracket, r_i=(x_i,y_i)\in B$ représente le $i$-ème robot.
 		\item $C=\left\{\{(x,y),(x',y')\}\;\Big|\; \left\{\begin{array}{ll}
 					(x,y) &\in B \\
 					(x',y') &\in B \\
 					\abs{x-x'}+\abs{y-y'} &=1
-				\end{array}\right.\right\}$ l'ensemble des collisions entre deux cases de $B$.
+				\end{array}\right.\right\}$ l'ensemble des collisions entre les cases de $B$, deux à deux.
 		\item $D=\left\{(1,0),(-1,0),(0,1),(0,-1)\right\}$ l'ensemble des directions cardinales.
 	\end{itemize}
 	
@@ -181,7 +181,7 @@
 	
 	L'inclusion $\mathcal{S}_v\subset\mathcal{S}$ est ainsi triviale.
 	
-	\begin{myprop}
+	\begin{myprop} \label{prop:card}
 		On a $\Card\left(\mathcal{S}_v\right)=\frac{(n^2)!}{(n^2-k)!}$.
 	\end{myprop}
 	
@@ -208,14 +208,18 @@
 		\]
 		
 		avec $t=\min \Big\{ s \in \mathbb{N}^* \;\Big|\; \begin{array}{ll}
-			&(x_i,y_i) + d(s+1) \in R \\
-			\text{ou} &\{ (x_i,y_i) + ds, (x_i,y_i) + d(s+1) \} \in C 
+			&\exists j \in\llbracket 1;k\rrbracket,\; r_i + d(s+1) = r_j \\
+			\text{ou} &\{ r_i + ds, r_i + d(s+1) \} \in C 
 		\end{array}\Big\}$
 	\end{mydef}
 	
 	\begin{myrem}
-		Comme pour le passage d'un état à un autre, il est facile de trouver les variables $i$ et $d$, il convient de simplifier l'écriture de $\delta(S,i,d)$ par $\delta(S)$.
+		Comme pour le passage d'un état à un autre, il est facile de trouver les variables $i$ et $d$, il est recevable de simplifier l'écriture de $\delta(S,i,d)$ par $\delta(S)$.
 	\end{myrem}
+	
+	\begin{myprop} \label{prop:delta}
+		À partir d'un état, $\delta$ peut engendrer $\Card(D)\times k$ états valides.
+	\end{myprop}
 	
 	\begin{mydef}
 		Soit $t\in\llbracket 1;k\rrbracket$ et $S_0=(r_1,\ldots,r_k)\in\mathcal{S}_v$ l'état initial. Soit $g\in B$ une case. On dit que $g$ est \textit{atteignable} depuis $S_0$ par $r_t$ \underline{ssi} il existe une suite finie de $m+1\in\mathbb{N}$ états $(S_i)_{i\in\llbracket 0;m\rrbracket}$ telle que pour tout $i\in\llbracket 1;m\rrbracket, \delta(S_{i-1})=S_i$ et $(S_m)_t=g$ où $(S_m)_t$ désigne la position du $t$-ième robot dans l'état considéré.
@@ -245,24 +249,148 @@
 		\end{itemize}
 	\end{mydef}
 	
+	\begin{mydef}
+		Soit $(t,g,R)\in \llbracket 1;k\rrbracket\times G\times B^k$. Soit $\mathcal{C}=(k,n,t,C,R,g)$ une configuration de jeu et $S\in\mathcal{S}_v$. $S$ est dit \textit{terminal} \underline{ssi} $(S)_t=g$. On note l'ensemble des états terminaux par $\mathcal{T}$.
+	\end{mydef}
+	
+	Il est ainsi clair que $\mathcal{T}\subseteq\mathcal{S}_v$.	
+	
 %-----------------------------------------------
 	\newpage
 	\section{Analyse du problème}
+	
+	À partir de la formalisation précédente, nous étudions maintenant la nature du problème de recherche induit, ses contraintes en termes de calculs, ainsi que les approches algorithmiques envisageables pour le résoudre.
+	
 	\subsection{Nature et caractéristiques du problème}
+	
+	Le jeu \textit{Rasende Roboter} est modélisable par un problème de recherche dans un espace d’états, certes fini mais très vaste.
+	Chaque état valide correspond à un sommet du graphe orienté engendré, et chaque application de la fonction de transition $\delta$ définit alors une arête entre deux nœuds.
+	
+	L’objectif est de trouver pour une configuration de jeu donnée, une suite de transitions menant d’un état initial $S_0\in\mathcal{S}_v$ à un état terminal $S_G \in \mathcal{T}$, tout en minimisant le nombre de coups effectués par des déplacements de robots. En sus d'être un problème de décision, il s'agit également d'un problème d'optimisation.
+	
+	À partir de ce paragraphe, on considère $n=16$ et $k=4$. Les autres variables restent quantifiées de la même manière.
+	
 	\subsection{Contraintes et difficultés}
-	\subsection{Structures de données envisageables}
-	\subsection{Approches algorithmiques possibles}
+	D'après la proposition~\ref{prop:card}, l’espace d’états $\mathcal{S}_v$ est de cardinal $\frac{256!}{252!}=253\times 254\times 255 \times 256 \approx 4,2\times 10^9$, d'où un nombre d’états presque impossible à gérer.
+	
+	De plus, le facteur de branchement est important: à chaque état, il est possible de déplacer chacun des $k$ robots dans les quatre directions cardinales $D$, tant que le déplacement est valide. Ainsi, chaque nœud a au plus $16$ enfants (\textit{d'après la proposition~\ref{prop:delta}}). 
+	
+	Ces caractéristiques rendent toute exploration exhaustive de l’espace d’états rapidement intractable sans stratégie de recherche adaptée.
+	
+	\subsection{Graphe implicite}
+	Le graphe n’est jamais construit explicitement en raison de sa taille combinatoire. Les successeurs d’un état sont générés dynamiquement à l’aide de la fonction de transition $\delta$ lors de l’exploration. C'est pour cela que l'on parle de \textit{graphe implicite}.
+	
+	Ce dernier est ainsi:
+	\begin{itemize}
+		\item Fini
+		\item Orienté
+		\item Non pondéré (\textit{on considère qu'une transition a un coût unitaire})
+		\item Fortement connexe par composantes
+		\item De facteur de branchement borné par $\Card(D)\times k$ (\textit{ici par $16$})
+	\end{itemize}
+	
+	
+	\textbf{EXEMPLE ICI}
+	
+	\subsection{Approches algorithmiques}
+	La résolution du problème peut être abordée par des algorithmes de parcours	de graphes orientés. On distingue ainsi deux familles:
+	
 	\subsubsection{Recherche non informée}
+	Les algorithmes de recherche non informée, tels que le parcours en largeur (\textit{BFS}), explorent l’espace d’états sans utiliser d’information spécifique au problème. BFS garantit la découverte d’une solution optimale en nombre de coups, au prix d’une consommation mémoire importante.
+	
 	\subsubsection{Recherche informée}
+	Les algorithmes de recherche informée, comme A*, exploitent une heuristique
+	estimant la distance restante jusqu’à l’objectif. Cette approche permet de réduire considérablement le nombre d’états explorés, tout en conservant l’optimalité pourvu que l'heuristique soit admissible.
+	
 	\subsubsection{Critères de choix d'une approche}
+	
+	Le choix de l’algorithme dépend essentiellement de:
+	\begin{itemize}
+		\item La taille de l’espace d’états
+		\item L'optimalité de la solution à trouver
+		\item Des complexités spatiales et temporelles
+	\end{itemize}
+
 %-----------------------------------------------
 	\newpage
 	\section{Traitement du problème}
-	\subsection{Principe général de la solution retenue}
-	\subsection{Algorithmes implémentés}
-	\subsubsection{Parcours en largeur d'abord}
+	\subsection{Algorithmes étudiés}
+	\subsubsection{Parcours en largeur}
+	
+	\begin{myprop} \label{prop:opti}
+		Soit $G$ un graphe. Un parcours en largeur est \textit{optimal} \underline{ssi}
+		\begin{enumerate}
+			\item $G$ est non pondéré
+			\item Chaque transition correspond à un coût unitaire
+			\item $G$ est exploré sans revisiter les états déjà rencontrés
+		\end{enumerate}
+	\end{myprop}
+	
+	Notons que les hypothèses énoncées dans la proposition~\ref{prop:opti} sont rencontrées pour ce problème.
+	
+	\begin{myprop}
+		Le parcours en largeur trouve une solution optimale en nombre de coups lorsqu’elle existe.
+	\end{myprop}
+	
+	\begin{proof}
+		Considérons le graphe orienté implicite $G=(\mathcal{S}_v,E)$, où pour tout $(S,S')\in\mathcal{S}_v^2,\;(S,S')\in E \iff S'=\delta(S)$ pour une action valide.
+		
+		Soit $S_0\in\mathcal{S}_v$ l'état initial. Le parcours en largeur explore les sommets de $G$ par couches successives, où la couche $d\in\mathbb{N}^*$ contient exactement les états atteignables depuis $S_0$ par une suite de $d$ transitions.
+		
+		Soit $S_G\in\mathcal{T}$ un état terminal tel que la distance minimale entre $S_0$ et $S_G$ soit $d^\star$. Par construction, BFS explore tous les états à distance strictement inférieure
+		à $d^\star$ avant d’explorer ceux à distance $d^\star$.
+		
+		Ainsi, lors de la première rencontre d’un état terminal $S_G$, le chemin construit comporte exactement $d^\star$ transitions, ce qui est minimal. 
+		
+		Par conséquent, BFS retourne une solution optimale en nombre de coups.
+	\end{proof}
+	
+	
 	\subsubsection{Algorithme A*}
-	\subsubsection{Heuristique utilisée}
+	
+	\begin{myprop}
+		A* est \textit{optimal} \underline{ssi}	
+		\begin{enumerate}
+			\item Tous les coûts d'arêtes sont positifs
+			\item L'heuristique $h$ est \textit{admissible}, i.e $\forall S\in\mathcal{S }_v, h(S)\le h^\star (S)$ où $h^\star$ représente le coût réel pour aller à un état
+		\end{enumerate}
+	\end{myprop}
+	
+	\begin{myprop}
+		Si l’heuristique $h$ est admissible, alors l’algorithme A* retourne une
+		solution optimale en nombre de coups lorsqu’elle existe.
+	\end{myprop}
+	
+	\begin{proof}
+		Soit $S_0\in\mathcal{S}_v$ l'état initial. Soit $S_G\in\mathcal{T}$ un état terminal atteignable depuis $S_0$, et soit $c^\star$ le coût minimal pour aller de $S_0$ à $S_G$.
+		
+		Soit $(g,h)\in\left(\mathcal{F}(\mathcal{S}_v,\mathbb{N})\right)^2$, avec pour tout $S\in\mathcal{S}_v$, $g(S)$ et $h(S)$ représente respectivement le coût exact de $S_0$ vers $S$ et l'heuristique évaluée en $S$, supposée admissible. On peut ainsi définir la fonction $f:\mathcal{S}_v\to\mathbb{N}$ telle que $f=g+h$. 
+		
+		Pour tout état $S\in\mathcal{S}_v$, on a donc :
+		\[
+		f(S) \le g(S) + h^\star(S)
+		\]
+		
+		Supposons par l’absurde que A* retourne une solution $S\in\mathcal{S}_v$ de coût $c\in\mathbb{N}$ tel que $c > c^\star$ avant d’explorer un chemin optimal.
+		Alors, il existe un état $S'\in\mathcal{S}_v$ sur un chemin optimal tel que
+		\[
+		g(S') + h(S') \le g(S') + h^\star(S') < c
+		\]
+		
+		D'où:
+		\[
+		f(S') \le c^\star < c
+		\]
+		ce qui implique que $S'$ aurait dû être extrait de la file de priorité
+		avant $S$, ce qui est absurde.
+		
+		Ainsi, le premier état terminal extrait par A* correspond nécessairement
+		à un chemin de coût minimal.
+	\end{proof}
+	
+	\subsubsection{Heuristiques étudiées}
+	
+	
 	\subsection{Organisation du programme}
 %-----------------------------------------------
 	\newpage
