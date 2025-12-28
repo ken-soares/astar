@@ -315,10 +315,17 @@
 	\newpage
 	\section{Traitement du problème}
 	\subsection{Algorithmes étudiés}
+	
+	Compte tenu de la formalisation précédente du problème comme un parcours de graphe implicite d’états, plusieurs algorithmes de recherche	peuvent être envisagés. Parmi eux, nous avons retenu le parcours en largeur et l’algorithme A*, qui présentent des garanties d’optimalité adaptées
+	dans ce contexte.
+	
+	Dans cette section, nous justifions l’admissibilité de ces deux algorithmes pour la résolution du problème considéré. Nous analysons ensuite leurs propriétés théoriques, notamment en termes d’optimalité, ainsi que de complexité temporelle et spatiale, afin de mettre en évidence
+	leurs avantages et leurs limites respectives.
+	
 	\subsubsection{Parcours en largeur}
 	
 	\begin{myprop} \label{prop:opti}
-		Soit $G$ un graphe. Un parcours en largeur est \textit{optimal} \underline{ssi}
+		Soit $G$ un graphe. Un parcours en largeur retourne une solution \textit{optimale} \underline{ssi}
 		\begin{enumerate}
 			\item $G$ est non pondéré
 			\item Chaque transition correspond à un coût unitaire
@@ -345,20 +352,19 @@
 		Par conséquent, BFS retourne une solution optimale en nombre de coups.
 	\end{proof}
 	
+	\paragraph{Complexité temporelle}\label{par:temp} Un parcours en largeur dans un graphe $G=(V,E)$ a une complexité en $\mathcal{O}(\abs{V}+\abs{E})$. On admet tout d'abord que $\Card(\mathcal{S}_v)\approx(n^2)^k$. Ensuite, on sait que le facteur de branchement est majoré par $4k$. Ainsi, pour ce problème, BFS est en $\mathcal{O}(k(n^2)^k)$. On remarque ainsi que le jeu est en complexité exponentielle en $k$ et polynomiale en $n$ ; on en conclut que plus il y a de robots, plus il devient difficile de trouver une solution en un temps raisonnable.
+	
+	\paragraph{Complexité spatiale}\label{par:spat} Un parcours en largeur dans un graphe $G=(V,E)$ a une complexité en mémoire en $\mathcal{O}(\abs{V})$. On a donc ici une occupation de la mémoire en $\mathcal{O}((n^2)^k)$. Les mêmes remarques s'appliquent que pour le paragraphe précédent.
+	
 	
 	\subsubsection{Algorithme A*}
 	
 	\begin{myprop}
 		A* est \textit{optimal} \underline{ssi}	
 		\begin{enumerate}
-			\item Tous les coûts d'arêtes sont positifs
-			\item L'heuristique $h$ est \textit{admissible}, i.e $\forall S\in\mathcal{S }_v, h(S)\le h^\star (S)$ où $h^\star$ représente le coût réel pour aller à un état
+			\item Tous les coûts d'arêtes sont strictement positifs
+			\item L'heuristique $h$ est \textit{admissible}, i.e $\forall S\in\mathcal{S }_v, h(S)\le h^\star (S)$ où $h^\star$ représente le coût minimal réel restant pour aller à un état terminal
 		\end{enumerate}
-	\end{myprop}
-	
-	\begin{myprop}
-		Si l’heuristique $h$ est admissible, alors l’algorithme A* retourne une
-		solution optimale en nombre de coups lorsqu’elle existe.
 	\end{myprop}
 	
 	\begin{proof}
@@ -388,23 +394,83 @@
 		à un chemin de coût minimal.
 	\end{proof}
 	
+	\paragraph{Complexité temporelle} A* ici est en $\mathcal{O}(k(n^2)^k)$. Les mêmes remarques qu'au paragraphe \ref{par:temp} s'appliquent. Néanmoins, notons qu'une bonne heuristique permet d'évincer l'exploration d'états peu intéressants.
+	
+	\paragraph{Complexité spatiale} A* occupe ici un espace en $\mathcal{O}((n^2)^k)$. Les mêmes remarques qu'au paragraphe \ref{par:spat} s'appliquent.
+	
 	\subsubsection{Heuristiques étudiées}
+	Dans cette partie, on présente plusieurs heuristiques auxquelles on pourrait penser afin de guider notre recherche dans $\mathcal{S}_v$.
 	
+	\paragraph{Heuristique nulle} Prenons pour tout $S\in\mathcal{S}_v, h(S)=0$. Cette heuristique est bien admissible car elle ne surestime pas le coût réel pour passer d'un état initial à l'état final. Néanmoins, on note qu'elle n'est pas informative et de ce fait, A* dégénère et parcours l'ensemble de l'espace d'états jusqu'à trouver la solution optimale. \textbf{Inutilisable en pratique}.
 	
+	\begin{myrem}
+		Notons toutefois qu'un parcours en largeur est un cas particulier de A* avec une heuristique nulle, et des coûts unitaires.
+	\end{myrem}
+	
+	\paragraph{Distance de Manhattan} Soit $i\in\llbracket 1;k\rrbracket$ l'indice du robot cible. Prenons pour tout $(S,g)\in\mathcal{S}_v\times G, h(S)=d_1((S)_i, g)$, avec $\begin{array}{lll}
+		d_1 : & \mathbb{R}^2\times\mathbb{R}^2 &\to\mathbb{R}^+\\
+		& ((x,y), (x',y')) &\mapsto\abs{x-x'}+\abs{y-y'}
+	\end{array}$. Cette application semble de prime abord assez naturel, cependant on rencontre rapidement un problème. Supposons que j'ai un pion à 4 cases de l'objectif, ainsi on aura $h(S)=4$ pour cet état $S$. Or, d'après $\delta$, il ne suffit que d'un coup pour arriver à l'objectif. Ainsi, elle surestime le coût réel. Donc \textbf{cette heuristique n'est pas admissible}.
+	
+	\paragraph{Heuristique naïve} Soit $i\in\llbracket 1;k\rrbracket$ l'indice du robot cible. Prenons pour tout $(S=((x_j,y_j))_{j\in\llbracket 1;k\rrbracket},(x_g,y_g))\in\mathcal{S}_v\times G, h(S) = \left\{\begin{array}{ll}
+		0 & \text{si } S\in\mathcal{T}\\
+		1 & \text{si } x_i=x_g \text{ ou } y_i=y_g\\
+		2 & \text{sinon} 
+	\end{array}\right.$. Cette heuristique est bien admissible, mais reste peu informative. Elles reste malgré tout meilleure que BFS. \textbf{Utilisable, mais peu informative}.
+	
+	\paragraph{Heuristique par "glissades"} Soit $i\in\llbracket 1;k\rrbracket$ l'indice du robot cible. Soit $g\in G$ la case d'arrivée. On construit une heuristique $h$ au début de chaque nouvelle partie à partir des règles suivantes:
+	\begin{enumerate}
+		\item On considère un plateau dénué de tous robots.
+		\item On définit la matrice $H=(\tilde{h}_{i,j})_{(i,j)\in\llbracket 1;n\rrbracket^2}\in\mathcal{M}(\mathbb{N})$ tel que pour tout $(i,j)\in\llbracket 1;n\rrbracket^2, \tilde{h}_{i,j}=\left\{\begin{array}{ll}
+			0 & \text{si } (i,j)=g\\
+			+\infty & \text{sinon}
+		\end{array}\right.$.
+		\item On note $p=(x_p,y_p)$ la case parent. On applique la fonction $\tilde{\delta}$ sur $p$ pour obtenir l'ensemble $E$ des cases atteignables depuis celle-ci. \textbf{DEFINIR DELTA TILDE}
+		\item Pour tout $c=(x,y)\in E,\; \tilde{h}_{x,y}=\tilde{h}_{x_p,y_p}+1.$
+		\item On applique les opérations 3 et 4 sur chacun des nœuds engendrés jusqu'à avoir traité tout le plateau.
+	\end{enumerate}
+	On a ainsi pour tout $S=((x_j,y_j))_{j\in\llbracket 1;k\rrbracket}\in\mathcal{S}_v,\; h(S)=\tilde{h}_{x_i,y_i}$. Autrement dit, on a effectué un parcours en largeur depuis un état terminal afin d'évaluer à combien de déplacements une case se trouve de la case finale. Cette heuristique est bien sûr admissible, et n'est calculée qu'une seule en début de partie (\textit{$\mathcal{O}(n^2)$ en création et $\theta(1)$ en accès}). \textbf{Utilisable et informative}.
+	
+	\subsubsection{Comparaisons}
+	
+	\begin{center}
+		\begin{tabular}{|l|l|l|}
+			\hline
+			\textbf{Critère} & \textbf{BFS} & \textbf{A*}\\
+			\hline
+			\hline
+			\textit{Optimalité} & Oui & Si heuristique admissible\\
+			\hline
+			\textit{Temps} & $\mathcal{O}(k(n^2)^k)$ & Meilleure que BFS si $h$ bien trouvé\\
+			\hline
+			\textit{Mémoire} & Très élevée & Très élevée\\
+			\hline
+			\textit{Usage} & Petits graphes & Espaces larges avec coûts variables \\
+			\hline
+		\end{tabular}
+	\end{center}
+		
 	\subsection{Organisation du programme}
 %-----------------------------------------------
 	\newpage
 	\section{Études de cas \& Résultats}
 	\subsection{Description des situations testées}
+	\textbf{INSERT TEXT HERE}
 	\subsection{Résultats obtenus}
+	\textbf{INSERT TEXT HERE}
 	\subsection{Interprétation des résultats}
+	\textbf{INSERT TEXT HERE}
 %-----------------------------------------------	
 	\newpage	
 	\section{Retour d'expérience}
 	\subsection{Organisation}
+	\textbf{INSERT TEXT HERE}
 	\subsection{Difficultés rencontrées}
+	\textbf{INSERT TEXT HERE}
 	\subsection{Suggestions d'amélioration}
+	\textbf{INSERT TEXT HERE}
 %-----------------------------------------------
 	\newpage	
 	\section{Conclusion}
+	\textbf{INSERT TEXT HERE}
 \end{document}
