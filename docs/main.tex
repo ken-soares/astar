@@ -131,11 +131,17 @@
 	\section{Présentation générale}
 	\subsection{Rappel de l'énoncé du sujet}
 	
-	\textbf{INSERT TEXT HERE}
+	Permettre à l'utilisateur de jouer des parties de Rasende Roboter contre l'ordinateur. L'utilisateur devrait pouvoir choisir au début de la partie la force de l'ordinateur.
 	
 	\subsection{Conventions}
 	
-	\textbf{INSERT TEXT HERE}
+	Nous avions utilisé plusieurs conventions de code, afin de le clarifier pour tous ses utilisateurs et de le rendre professionnel:
+    \begin{itemize}
+        \item le nommage de variables et de constantes formalisé (sens des noms, minuscules, majuscules, tirets du bas...)
+        \item l'ajout de commentaires en anglais pour de nombreux blocs de code
+        \item l'organisation structurée à l'aide de classes et de fichiers appropriés
+        \item les éléments supplémentaires pour la compréhension du code comme le \verb|README| 
+    \end{itemize}
 	
 	\subsection{Outils utilisés}
 	
@@ -275,7 +281,7 @@
 	
 	De plus, le facteur de branchement est important: à chaque état, il est possible de déplacer chacun des $k$ robots dans les quatre directions cardinales $D$, tant que le déplacement est valide. Ainsi, chaque nœud a au plus $16$ enfants (\textit{d'après la proposition~\ref{prop:delta}}). 
 	
-	Ces caractéristiques rendent toute exploration exhaustive de l’espace d’états rapidement intractable sans stratégie de recherche adaptée.
+	Ces caractéristiques rendent toute exploration exhaustive de l’espace d’états rapidement in-tractable sans stratégie de recherche adaptée.
 	
 	\subsection{Graphe implicite}
 	Le graphe n’est jamais construit explicitement en raison de sa taille combinatoire. Les successeurs d’un état sont générés dynamiquement à l’aide de la fonction de transition $\delta$ lors de l’exploration. C'est pour cela que l'on parle de \textit{graphe implicite}.
@@ -289,11 +295,8 @@
 		\item De facteur de branchement borné par $\Card(D)\times k$ (\textit{ici par $16$})
 	\end{itemize}
 	
-	
-	\textbf{EXEMPLE ICI}
-	
 	\subsection{Approches algorithmiques}
-	La résolution du problème peut être abordée par des algorithmes de parcours	de graphes orientés. On distingue ainsi deux familles:
+	La résolution du problème peut être abordée par des algorithmes de parcours de graphes orientés. On distingue ainsi deux familles:
 	
 	\subsubsection{Recherche non informée}
 	Les algorithmes de recherche non informée, tels que le parcours en largeur (\textit{BFS}), explorent l’espace d’états sans utiliser d’information spécifique au problème. BFS garantit la découverte d’une solution optimale en nombre de coups, au prix d’une consommation mémoire importante.
@@ -314,7 +317,7 @@
 %-----------------------------------------------
 	\newpage
 	\section{Traitement du problème}
-	\subsection{Algorithmes étudiés}
+	\subsection{Algorithmes étudiés} \label{sec:algoe}
 	
 	Compte tenu de la formalisation précédente du problème comme un parcours de graphe implicite d’états, plusieurs algorithmes de recherche	peuvent être envisagés. Parmi eux, nous avons retenu le parcours en largeur et l’algorithme A*, qui présentent des garanties d’optimalité adaptées
 	dans ce contexte.
@@ -425,7 +428,15 @@
 			0 & \text{si } (i,j)=g\\
 			+\infty & \text{sinon}
 		\end{array}\right.$.
-		\item On note $p=(x_p,y_p)$ la case parent. On applique la fonction $\tilde{\delta}$ sur $p$ pour obtenir l'ensemble $E$ des cases atteignables depuis celle-ci. \textbf{DEFINIR DELTA TILDE}
+		\item On note $p=(x_p,y_p)$ la case parent. On applique la fonction $\tilde{\delta}$ sur $p$ pour obtenir l'ensemble $E$ des cases atteignables depuis celle-ci. 
+        \[
+			\begin{array}{lll}
+				\tilde{\delta} :& \mathcal{S}_v\times\llbracket 1;k\rrbracket\times D &\rightarrow\mathcal{S}_v \\
+				&((r_1,\ldots,r_k),i,d)&\mapsto (r_1,\ldots,r_i+dt,\ldots,r_k)
+			\end{array}
+		\]
+        avec $t=\min \Big\{ s \in \mathbb{N}^* \;\Big|\; \{ r_i + ds, r_i + d(s+1) \} \in C \Big\}$
+        
 		\item Pour tout $c=(x,y)\in E,\; \tilde{h}_{x,y}=\tilde{h}_{x_p,y_p}+1.$
 		\item On applique les opérations 3 et 4 sur chacun des nœuds engendrés jusqu'à avoir traité tout le plateau.
 	\end{enumerate}
@@ -451,26 +462,120 @@
 	\end{center}
 		
 	\subsection{Organisation du programme}
+
+    \paragraph{Fichiers} Tous les scripts Python sont localisés dans le dossier \verb|src|. Chaque classe se trouve dans son propre fichier. Le fichier \verb|consts.py| contient les constantes utilisées à travers le projet. Le fichier \verb|board.txt| contient une copie des collisions (\textit{opérations bit à bit}) des cases du plateau, avec la première case en haut à gauche. Enfin le dossier \verb|docs| contient les sources de ce rapport.
+
+    \paragraph{Moteur de jeu} Notre projet utilise \verb|pygame| pour l'interface graphique et la gestion des entrées. Le point d'entrée est à travers la fonction \verb|main| dans le fichier éponyme. Le programme fonctionne ainsi de la manière suivante:
+    \begin{enumerate}
+        \item Initialisation de la fenêtre et des événements
+        \item Initialisation des éléments de jeu (\textit{joueur, plateau, \ldots})
+        \item Boucle principale
+        \begin{enumerate}
+            \item Mise à jour des objets de jeu
+            \item Rendu à l'écran
+            \item Pause pour maintenir 60 images par secondes
+        \end{enumerate}
+        \item Fermeture de la fenêtre \& Nettoyage
+    \end{enumerate}
+
+    \paragraph{Partie de jeu} La boucle principale agit comme un automate fini simple, selon les états suivants (\textit{définis dans} \verb|consts.py|):
+    \begin{enumerate}
+        \item \textbf{Initialisation de la partie}
+        \begin{itemize}
+            \item Variables remises à zéro
+            \item Choix d'une nouvelle configuration de jeu
+            \item Pré-calcul de l'heuristique (\textit{valeurs stockées dans un dictionnaire})
+        \end{itemize}
+        \item \textbf{Tour du joueur}
+        \begin{itemize}
+            \item Le joueur doit fournir une solution en moins de 60 secondes
+        \end{itemize}
+        \item \textbf{Fin de tour du joueur}
+        \begin{itemize}
+            \item Affichage des résultats du tour
+        \end{itemize}
+        \item \textbf{Calculs de l'IA}
+        \begin{itemize}
+            \item Application de l'algorithme de recherche dans un second processus
+            \item Si aucune solution n'est trouvée en 60 secondes, alors on passe aux résultats
+        \end{itemize}
+        \item \textbf{Tour de l'IA}
+        \begin{itemize}
+            \item L'IA donne le nombre de coups qu'elle va faire
+            \item Elle affiche sa solution étape par étape
+            \item Les scores sont mis à jour ici sauf si aucune solution n'a été trouvée
+        \end{itemize}
+        \item \textbf{Affichage des résultats de partie}
+        \begin{itemize}
+            \item Affichage des scores
+            \item Retour au premier état
+        \end{itemize}
+    \end{enumerate}
 %-----------------------------------------------
 	\newpage
-	\section{Études de cas \& Résultats}
-	\subsection{Description des situations testées}
-	\textbf{INSERT TEXT HERE}
+	\section{Résultats}
+    
+    Nous avons ainsi testé les algorithmes (\textit{et heuristiques pour A*}) présentés en section \ref{sec:algoe}.
+    
 	\subsection{Résultats obtenus}
-	\textbf{INSERT TEXT HERE}
+
+    \paragraph{Parcours en largeur} Pour une configuration de jeu quelconque, quand bien même l'algorithme est optimal, il ne termine pas. 
+
+    \paragraph{A* avec heuristique nulle} Mêmes résultats que pour le parcours en largeur.
+
+    \paragraph{A* avec heuristique naïve} L'algorithme ne termine pas en des temps raisonnables mais reste néanmoins meilleur que BFS.
+
+    \paragraph{A* avec heuristique $d_1$} Bien que l'heuristique ne soit pas admissible, il s'agit de celle qui donne les meilleurs résultats en termes de complexité temporelle. Néanmoins, son comportement dépend fortement de la configuration. Ainsi, la solution optimale n'est pas en moyenne pas fournie. 
+
+    \paragraph{A* avec heuristique par glissements} Pour une configuration quelconque, l'algorithme met en moyenne entre 10 et 20 secondes à fournir la solution optimale. Il arrive toutefois qu'il mette plus de temps parfois (\textit{quelques minutes}).
+	
 	\subsection{Interprétation des résultats}
-	\textbf{INSERT TEXT HERE}
+	Les résultats expérimentaux obtenus confirment les analyses théoriques menées dans les sections précédentes, en particulier concernant la taille de l’espace d’états et le rôle déterminant des heuristiques dans la réduction de la complexité effective de la recherche.
+
+    \paragraph{Limites des approches non informées}
+    Le parcours en largeur, bien qu’optimal par construction, souffre d’une explosion combinatoire de l’espace d’états. Pour une configuration standard du jeu, toute exploration exhaustive reste irréaliste en pratique. A* avec l'heuristique nulle étant équivalent à BFS, il hérite strictement des mêmes limitations et ne termine pas non plus dans des délais raisonnables.
+    
+    \paragraph{Apport partiel des heuristiques naïves}
+    L’heuristique naïve introduit une première forme de guidage de la recherche, ce qui permet de réduire le nombre d’états explorés par rapport à BFS. Toutefois, cette heuristique reste trop peu informative pour compenser la taille du graphe implicite. En conséquence, l’algorithme demeure trop lent pour résoudre une instance quelconque du problème.
+    
+    \paragraph{Compromis performance/optimalité avec la distance de Manhattan}
+    L’heuristique $d_1$ se révèle être la plus efficace en pratique en termes de temps de calcul. Son coût d’évaluation constant et son pouvoir discriminant élevé permettent à A* de se concentrer rapidement sur des zones pertinentes de l’espace d’états. Cependant, cette heuristique n’étant pas admissible dans le cadre des déplacements par glissements, l’optimalité des solutions produites n’est pas garantie. De plus, les performances observées varient fortement selon la configuration initiale et la position de la cible.
+    
+    \paragraph{Heuristique par glissements}
+    L’heuristique par glissements offre le meilleur compromis entre garanties théoriques et performances pratiques. En étant admissible, elle permet à A* de conserver son optimalité tout en réduisant drastiquement l’espace de recherche (\textit{en général, on explore au plus quelques milliers d'états au lieu de milliards}). Les temps d’exécution observés, bien que significatifs, restent compatibles avec une résolution effective du problème. Les cas où le temps de calcul augmente sensiblement correspondent à des configurations particulièrement défavorables, confirmant le caractère intrinsèquement difficile du problème.
+
+    \paragraph{Utilisation de la mémoire} Notons que peu importe la technique employée, la mémoire utilisée augmente exponentiellement. Cela constitue ainsi le défaut majeur des algorithmes présentés.
 %-----------------------------------------------	
 	\newpage	
 	\section{Retour d'expérience}
 	\subsection{Organisation}
-	\textbf{INSERT TEXT HERE}
+	Nous avons utilisé \textbf{GitHub} afin de centraliser le code tout en assurant un suivi régulier du projet. Cela nous a ainsi permis de travailler sur une base commune une fois l'implémentation commencée.
+	
+	De plus, nous avons cherché à nous placer dans le contexte du travail collaboratif en entreprise, et de ce fait, nous avons travaillé par \textit{Pull Requests}. La branche \verb|main| a été ainsi protégée par défaut des téléversements non approuvés au préalable.
+
+    En terme de tâches à effectuer, nous avions réparti le travail de manière relativement équilibrée.
 	\subsection{Difficultés rencontrées}
-	\textbf{INSERT TEXT HERE}
+	En terme d'organisation, nous avons trouvé la synchronisation entre nous particulièrement difficile concernant les \textit{pull requests}. Ce n'était pas trop dérangeant pendant le semestre, mais bien plus pendant les périodes de congés. Cela a engendré du retard et des différences de quantité de travail entre les membres, qui a dû être rattrapé.
+
+    En ce qui concerne le code à produire, la fonction \verb|astar| a dû être revue, afin de prendre en compte les positions des pions du plateau et ainsi pouvoir comparer le résultat trouvé par l'ordinateur à celui trouvé par le joueur. Nous n'avions pas suffisamment conçu l'ensemble du projet pour toujours être sur la même longueur d'onde.
+
+    Il n'y a eu aucun problème technique dû à un manque de compétences en python.
 	\subsection{Suggestions d'amélioration}
-	\textbf{INSERT TEXT HERE}
+    Tout d'abord, un point négatif est la gestion de la mémoire. En effet, il aurait été préférable d'utiliser un algorithme avec un $\mathcal{O}(n)$ en mémoire. Par exemple, un parcours en profondeur a cette complexité, néanmoins elle ne fournit jamais la solution optimale. Ainsi, peut-être pourrions-nous essayer d'élaguer certaines branches d'une exploration en profondeur en se basant sur le principe de l'heuristique ?
+    
+
+    Il est également à noter que nous n'avons pas permis à l'utilisateur de changer le niveau de difficulté de l'IA. En effet, comme le problème revient à trouver l'existence d'une solution, il y aurait alors un choix à faire:
+    \begin{itemize}
+        \item Soit on considère le temps d'exécution comme niveau de difficulté (\textit{plus l'IA est rapide, plus elle est dure})
+        \item Soit on considère l'optimalité de la solution
+    \end{itemize}
+    Cela revient en somme à jouer sur l'heuristique employée dans A*. Nous avons ainsi décidé que ce point était inutile.
+    
 %-----------------------------------------------
 	\newpage	
 	\section{Conclusion}
-	\textbf{INSERT TEXT HERE}
+    
+	Les résultats obtenus mettent en évidence que, pour le jeu \textit{Rasende Roboter}, la faisabilité algorithmique repose essentiellement sur la qualité de l’heuristique utilisée. Les approches non informées sont rapidement dépassées par la taille de l’espace d’états, tandis que des heuristiques bien conçues permettent de rendre le problème tractable en pratique, au prix éventuel de l’abandon de l’optimalité ou d’un coût de calcul supplémentaire.
+
+    Cependant, ce problème déterministe en soulève un second. Que se passe-t-il si on considère une grille générée aléatoirement ? A-t-on nécessairement l'existence d'au moins une solution pour une instance donnée ? Ainsi, cela constitue un problème très compliqué.
 \end{document}
