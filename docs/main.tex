@@ -1,70 +1,581 @@
-\documentclass[a4paper,11pt,titlepage]{article}
-
+\documentclass[paper=a4,fontsize=12pt,titlepage]{scrartcl}
+%-----------------------------------------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[english]{babel}
-\usepackage{color}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+%-----------------------------------------------
+\usepackage{amsmath,amssymb,amsthm,mathtools,stmaryrd}
+%-----------------------------------------------
 \usepackage{xcolor}
 \usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\usepackage{stmaryrd}
-\usepackage[hmargin={2.5cm,2.5cm},top=2.5cm,bottom=2.5cm]{geometry}
-\usepackage{lmodern}
-\usepackage[ruled,lined]{algorithm2e}
-\usepackage{listings}
 \usepackage{tikz, pgf}
-
-\usepackage[colorlinks=true,breaklinks=true,linkcolor=blue,filecolor=magenta,urlcolor=cyan,pdftitle={Project},pdfsubject={Project}]{hyperref}
+\usepackage{float}
+\usepackage{adjustbox}
 
 \usetikzlibrary{arrows,shapes,positioning}
+%-----------------------------------------------
+\usepackage[ruled,lined]{algorithm2e}
+\usepackage{listings}
+%-----------------------------------------------
+\usepackage[
+	colorlinks=true,
+	breaklinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=cyan,
+	pdftitle={Project},
+	pdfsubject={Project}
+]{hyperref}
+%-----------------------------------------------
+\usepackage{typearea}
 
-\title{IA41 Project Template}
-\author{blah}
+\KOMAoptions{
+	DIV=12,
+	BCOR=0mm,
+	abstract=true,
+	pagesize=auto
+}
+\recalctypearea
+%-----------------------------------------------
+\newenvironment{AThreeLandscape}{%
+	\clearpage
+	\KOMAoptions{paper=a3, paper=landscape}%
+	\recalctypearea%
+	\thispagestyle{plain}%
+}{%
+	\clearpage
+	\KOMAoptions{paper=a4, paper=portrait}%
+	\recalctypearea%
+}
+%-----------------------------------------------
+\newenvironment{AFourLandscape}{%
+	\clearpage
+	\KOMAoptions{paper=a4, paper=landscape}%
+	\recalctypearea%
+	\thispagestyle{plain}%
+}{%
+	\clearpage
+	\KOMAoptions{paper=a4, paper=portrait}%
+	\recalctypearea%
+}
+%-----------------------------------------------
+\newtheorem{theorem}{Théorème}
+\newtheorem{axiom}{Axiome}
 
+\theoremstyle{definition}
+\newtheorem{mydef}{Définition}
+\newtheorem{mycor}{Corollaire}
 
+\theoremstyle{remark}
+\newtheorem{myrem}{Remarque}
+
+\theoremstyle{plain}
+\newtheorem{myprop}{Proposition}
+
+\DeclareMathOperator{\Ima}{Im}
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Card}{Card}
+\DeclareMathOperator{\Sp}{Sp}
+\DeclareMathOperator{\Inf}{Inf}
+\DeclareMathOperator{\Vect}{Vect}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Mat}{\mathcal{M}at}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+%-----------------------------------------------
+\sloppy
+\hyphenpenalty=10000
+%-----------------------------------------------
+\title{
+	\Huge Rasende Roboter\\
+	\Large Projet IA41
+}
+
+\author{
+	Noa \textsc{FOUICH}\\
+	Corentin \textsc{HAUTEFAYE}\\
+	William \textsc{LE GALLOU}\\
+	Kenneth \textsc{SOARES}
+}
+
+\date{Janvier 2026}
+%-----------------------------------------------
 \begin{document}
 	
 	\maketitle
-	\newpage
+	
+	\renewcommand*{\abstractname}{Introduction}
+	\begin{abstract}
+		\thispagestyle{plain}
+		Dans le cadre de l'UE IA41 (\textit{Semestre A25}), nous avons réalisé une implémentation du jeu de décision \textit{Rasende Roboter}. L'objectif de ce projet est
+		de programmer un système capable de fournir une solution aux configurations proposées, autrement dit de permettre à un utilisateur de jouer des parties contre l'ordinateur.
+	\end{abstract}
 	
 	\tableofcontents
+	\clearpage
+%-----------------------------------------------
+	\section{Présentation générale}
+	\subsection{Rappel de l'énoncé du sujet}
+	
+	Permettre à l'utilisateur de jouer des parties de Rasende Roboter contre l'ordinateur. L'utilisateur devrait pouvoir choisir au début de la partie la force de l'ordinateur.
+	
+	\subsection{Conventions}
+	
+	Nous avions utilisé plusieurs conventions de code, afin de le clarifier pour tous ses utilisateurs et de le rendre professionnel:
+    \begin{itemize}
+        \item le nommage de variables et de constantes formalisé (sens des noms, minuscules, majuscules, tirets du bas...)
+        \item l'ajout de commentaires en anglais pour de nombreux blocs de code
+        \item l'organisation structurée à l'aide de classes et de fichiers appropriés
+        \item les éléments supplémentaires pour la compréhension du code comme le \verb|README| 
+    \end{itemize}
+	
+	\subsection{Outils utilisés}
+	
+	Pour réaliser ce projet, les outils suivants ont été utilisés:
+	\begin{itemize}
+		\item \textbf{Python 3} 
+		\item \textbf{PyGame} pour l'interface graphique
+		\item \textbf{Git} et \textbf{GitHub} pour le contrôle des versions
+		\item \textbf{\LaTeX} pour la rédaction du rapport
+	\end{itemize}
+%-----------------------------------------------
 	\newpage
+	\section{Spécification du problème}
 	
-	\section{Introduction}
+	Dans cette section, on cherche à généraliser et formaliser une partie de jeu. 
 	
-	\begin{align*}
-		x = 2 &\implies x²=4 \text{ dtdtdtdt}
-	\end{align*}
+	\subsection{Notations}
 	
-	\verb|azerxdrsdr5|
+	Soit $k\in\mathbb{N}\backslash\{0;1\}$. Soit $n\in\mathbb{N}$ tel que $n\ge k+1$. Afin de représenter le plateau de jeu, on définit les notations suivantes:
+	\begin{itemize}
+		\item $B=\llbracket 1;n\rrbracket^2$ une grille de $n\times n$ cases.
+		\item Pour tout $i\in\llbracket 1;k\rrbracket, r_i=(x_i,y_i)\in B$ représente le $i$-ème robot.
+		\item $C=\left\{\{(x,y),(x',y')\}\;\Big|\; \left\{\begin{array}{ll}
+					(x,y) &\in B \\
+					(x',y') &\in B \\
+					\abs{x-x'}+\abs{y-y'} &=1
+				\end{array}\right.\right\}$ l'ensemble des collisions entre les cases de $B$, deux à deux.
+		\item $D=\left\{(1,0),(-1,0),(0,1),(0,-1)\right\}$ l'ensemble des directions cardinales.
+	\end{itemize}
 	
+	\subsection{Espace d'états}
+	
+	\begin{mydef}
+		On définit un \textit{état du jeu} par tout $k$-uplet de $B$.
+		L'ensemble de tous les états possibles, noté $\mathcal{S}$, correspond à l'ensemble des positions occupées par les $k$ robots, d'où $\mathcal{S}=B^k$.
+	\end{mydef}
+	
+	Il est important de noter que de ce fait, on obtient $\Card(\mathcal{S})=n^{2k}$. Or, la définition proposée n'impose pas à un état d'être valide. En effet, il est impossible que deux robots occupent la même case, d'où:
+	
+	\begin{mydef}
+		On définit \textit{l'ensemble des états valides}, ou \textit{espace d'états}, et on note $\mathcal{S}_v=\left\{(r_1,\ldots,r_k)\in B^k\;\Big|\;\forall(i,j)\in\llbracket 1;k\rrbracket^2, (i\ne j)\implies (r_i\ne r_j)\right\}$. Un élément de $\mathcal{S}_v$ est dit \textit{valide}.
+	\end{mydef}
+	
+	L'inclusion $\mathcal{S}_v\subset\mathcal{S}$ est ainsi triviale.
+	
+	\begin{myprop} \label{prop:card}
+		On a $\Card\left(\mathcal{S}_v\right)=\frac{(n^2)!}{(n^2-k)!}$.
+	\end{myprop}
+	
+	\begin{proof}
+		On cherche le nombre de $k$-uplets injectifs $(r_1,\ldots,r_k):\llbracket 1;k\rrbracket\rightarrow B$. Formellement, chaque fonction $f:\llbracket 1;k\rrbracket\rightarrow B$ qui est injective correspond à un état valide. Or, le nombre de fonctions injectives de $\llbracket 1;k\rrbracket$ dans $B$ est exactement le nombre d'arrangements de $k$ parmi $n^2$ éléments.
+		
+		D'où, la conclusion.
+	\end{proof}
+	
+	\begin{myrem}
+		On obtient ainsi le fait que l'espace d'états croît très rapidement en fonction de $n$ et $k$.
+	\end{myrem}
+	
+	\subsection{Fonction de transition}
+	
+	\begin{mydef}
+		On définit la \textit{fonction de transition} pour passer d'un état valide à un autre, d'où:
+		
+		\[
+			\begin{array}{lll}
+				\delta :& \mathcal{S}_v\times\llbracket 1;k\rrbracket\times D &\rightarrow\mathcal{S}_v \\
+				&((r_1,\ldots,r_k),i,d)&\mapsto (r_1,\ldots,r_i+dt,\ldots,r_k)
+			\end{array}
+		\]
+		
+		avec $t=\min \Big\{ s \in \mathbb{N}^* \;\Big|\; \begin{array}{ll}
+			&\exists j \in\llbracket 1;k\rrbracket,\; r_i + d(s+1) = r_j \\
+			\text{ou} &\{ r_i + ds, r_i + d(s+1) \} \in C 
+		\end{array}\Big\}$
+	\end{mydef}
+	
+	\begin{myrem}
+		Comme pour le passage d'un état à un autre, il est facile de trouver les variables $i$ et $d$, il est recevable de simplifier l'écriture de $\delta(S,i,d)$ par $\delta(S)$.
+	\end{myrem}
+	
+	\begin{myprop} \label{prop:delta}
+		À partir d'un état, $\delta$ peut engendrer $\Card(D)\times k$ états valides.
+	\end{myprop}
+	
+	\begin{mydef}
+		Soit $t\in\llbracket 1;k\rrbracket$ et $S_0=(r_1,\ldots,r_k)\in\mathcal{S}_v$ l'état initial. Soit $g\in B$ une case. On dit que $g$ est \textit{atteignable} depuis $S_0$ par $r_t$ \underline{ssi} il existe une suite finie de $m+1\in\mathbb{N}$ états $(S_i)_{i\in\llbracket 0;m\rrbracket}$ telle que pour tout $i\in\llbracket 1;m\rrbracket, \delta(S_{i-1})=S_i$ et $(S_m)_t=g$ où $(S_m)_t$ désigne la position du $t$-ième robot dans l'état considéré.
+	\end{mydef}
+	
+	On définit ainsi l'ensemble $G$ des cases objectifs jouables par:
+	\[
+		G=\left\{g\in B \;|\;\exists m\in\mathbb{N}, \exists (S_i)_{i\in\llbracket 0;m\rrbracket}, \left\{\begin{array}{ll}
+			\forall i\in\llbracket 1;m\rrbracket, &\delta(S_{i-1})=S_i\\
+			(S_m)_t=g
+		\end{array}\right.\right\}
+	\]
+	
+	\begin{mydef}
+		On appelle \textit{configuration de jeu} tout sextuplet
+		\[
+		(k, n, t, C, R, g)
+		\]
+		où :
+		\begin{itemize}
+			\item $k$ est le nombre de robots,
+			\item $n$ est la taille du plateau,
+			\item $t\in\llbracket 1;k\rrbracket$ est l'indice du robot cible,
+			\item $R$ est l'ensemble des positions initiales des robots,
+			\item $C$ est l'ensemble des obstacles entre cases adjacentes,
+			\item $g \in G$ est la case objectif du robot cible.
+		\end{itemize}
+	\end{mydef}
+	
+	\begin{mydef}
+		Soit $(t,g,R)\in \llbracket 1;k\rrbracket\times G\times B^k$. Soit $\mathcal{C}=(k,n,t,C,R,g)$ une configuration de jeu et $S\in\mathcal{S}_v$. $S$ est dit \textit{terminal} \underline{ssi} $(S)_t=g$. On note l'ensemble des états terminaux par $\mathcal{T}$.
+	\end{mydef}
+	
+	Il est ainsi clair que $\mathcal{T}\subseteq\mathcal{S}_v$.	
+	
+%-----------------------------------------------
+	\newpage
+	\section{Analyse du problème}
+	
+	À partir de la formalisation précédente, nous étudions maintenant la nature du problème de recherche induit, ses contraintes en termes de calculs, ainsi que les approches algorithmiques envisageables pour le résoudre.
+	
+	\subsection{Nature et caractéristiques du problème}
+	
+	Le jeu \textit{Rasende Roboter} est modélisable par un problème de recherche dans un espace d’états, certes fini mais très vaste.
+	Chaque état valide correspond à un sommet du graphe orienté engendré, et chaque application de la fonction de transition $\delta$ définit alors une arête entre deux nœuds.
+	
+	L’objectif est de trouver pour une configuration de jeu donnée, une suite de transitions menant d’un état initial $S_0\in\mathcal{S}_v$ à un état terminal $S_G \in \mathcal{T}$, tout en minimisant le nombre de coups effectués par des déplacements de robots. En sus d'être un problème de décision, il s'agit également d'un problème d'optimisation.
+	
+	À partir de ce paragraphe, on considère $n=16$ et $k=4$. Les autres variables restent quantifiées de la même manière.
+	
+	\subsection{Contraintes et difficultés}
+	D'après la proposition~\ref{prop:card}, l’espace d’états $\mathcal{S}_v$ est de cardinal $\frac{256!}{252!}=253\times 254\times 255 \times 256 \approx 4,2\times 10^9$, d'où un nombre d’états presque impossible à gérer.
+	
+	De plus, le facteur de branchement est important: à chaque état, il est possible de déplacer chacun des $k$ robots dans les quatre directions cardinales $D$, tant que le déplacement est valide. Ainsi, chaque nœud a au plus $16$ enfants (\textit{d'après la proposition~\ref{prop:delta}}). 
+	
+	Ces caractéristiques rendent toute exploration exhaustive de l’espace d’états rapidement in-tractable sans stratégie de recherche adaptée.
+	
+	\subsection{Graphe implicite}
+	Le graphe n’est jamais construit explicitement en raison de sa taille combinatoire. Les successeurs d’un état sont générés dynamiquement à l’aide de la fonction de transition $\delta$ lors de l’exploration. C'est pour cela que l'on parle de \textit{graphe implicite}.
+	
+	Ce dernier est ainsi:
+	\begin{itemize}
+		\item Fini
+		\item Orienté
+		\item Non pondéré (\textit{on considère qu'une transition a un coût unitaire})
+		\item Fortement connexe par composantes
+		\item De facteur de branchement borné par $\Card(D)\times k$ (\textit{ici par $16$})
+	\end{itemize}
+	
+	\subsection{Approches algorithmiques}
+	La résolution du problème peut être abordée par des algorithmes de parcours de graphes orientés. On distingue ainsi deux familles:
+	
+	\subsubsection{Recherche non informée}
+	Les algorithmes de recherche non informée, tels que le parcours en largeur (\textit{BFS}), explorent l’espace d’états sans utiliser d’information spécifique au problème. BFS garantit la découverte d’une solution optimale en nombre de coups, au prix d’une consommation mémoire importante.
+	
+	\subsubsection{Recherche informée}
+	Les algorithmes de recherche informée, comme A*, exploitent une heuristique
+	estimant la distance restante jusqu’à l’objectif. Cette approche permet de réduire considérablement le nombre d’états explorés, tout en conservant l’optimalité pourvu que l'heuristique soit admissible.
+	
+	\subsubsection{Critères de choix d'une approche}
+	
+	Le choix de l’algorithme dépend essentiellement de:
+	\begin{itemize}
+		\item La taille de l’espace d’états
+		\item L'optimalité de la solution à trouver
+		\item Des complexités spatiales et temporelles
+	\end{itemize}
+
+%-----------------------------------------------
+	\newpage
+	\section{Traitement du problème}
+	\subsection{Algorithmes étudiés} \label{sec:algoe}
+	
+	Compte tenu de la formalisation précédente du problème comme un parcours de graphe implicite d’états, plusieurs algorithmes de recherche	peuvent être envisagés. Parmi eux, nous avons retenu le parcours en largeur et l’algorithme A*, qui présentent des garanties d’optimalité adaptées
+	dans ce contexte.
+	
+	Dans cette section, nous justifions l’admissibilité de ces deux algorithmes pour la résolution du problème considéré. Nous analysons ensuite leurs propriétés théoriques, notamment en termes d’optimalité, ainsi que de complexité temporelle et spatiale, afin de mettre en évidence
+	leurs avantages et leurs limites respectives.
+	
+	\subsubsection{Parcours en largeur}
+	
+	\begin{myprop} \label{prop:opti}
+		Soit $G$ un graphe. Un parcours en largeur retourne une solution \textit{optimale} \underline{ssi}
+		\begin{enumerate}
+			\item $G$ est non pondéré
+			\item Chaque transition correspond à un coût unitaire
+			\item $G$ est exploré sans revisiter les états déjà rencontrés
+		\end{enumerate}
+	\end{myprop}
+	
+	Notons que les hypothèses énoncées dans la proposition~\ref{prop:opti} sont rencontrées pour ce problème.
+	
+	\begin{myprop}
+		Le parcours en largeur trouve une solution optimale en nombre de coups lorsqu’elle existe.
+	\end{myprop}
+	
+	\begin{proof}
+		Considérons le graphe orienté implicite $G=(\mathcal{S}_v,E)$, où pour tout $(S,S')\in\mathcal{S}_v^2,\;(S,S')\in E \iff S'=\delta(S)$ pour une action valide.
+		
+		Soit $S_0\in\mathcal{S}_v$ l'état initial. Le parcours en largeur explore les sommets de $G$ par couches successives, où la couche $d\in\mathbb{N}^*$ contient exactement les états atteignables depuis $S_0$ par une suite de $d$ transitions.
+		
+		Soit $S_G\in\mathcal{T}$ un état terminal tel que la distance minimale entre $S_0$ et $S_G$ soit $d^\star$. Par construction, BFS explore tous les états à distance strictement inférieure
+		à $d^\star$ avant d’explorer ceux à distance $d^\star$.
+		
+		Ainsi, lors de la première rencontre d’un état terminal $S_G$, le chemin construit comporte exactement $d^\star$ transitions, ce qui est minimal. 
+		
+		Par conséquent, BFS retourne une solution optimale en nombre de coups.
+	\end{proof}
+	
+	\paragraph{Complexité temporelle}\label{par:temp} Un parcours en largeur dans un graphe $G=(V,E)$ a une complexité en $\mathcal{O}(\abs{V}+\abs{E})$. On admet tout d'abord que $\Card(\mathcal{S}_v)\approx(n^2)^k$. Ensuite, on sait que le facteur de branchement est majoré par $4k$. Ainsi, pour ce problème, BFS est en $\mathcal{O}(k(n^2)^k)$. On remarque ainsi que le jeu est en complexité exponentielle en $k$ et polynomiale en $n$ ; on en conclut que plus il y a de robots, plus il devient difficile de trouver une solution en un temps raisonnable.
+	
+	\paragraph{Complexité spatiale}\label{par:spat} Un parcours en largeur dans un graphe $G=(V,E)$ a une complexité en mémoire en $\mathcal{O}(\abs{V})$. On a donc ici une occupation de la mémoire en $\mathcal{O}((n^2)^k)$. Les mêmes remarques s'appliquent que pour le paragraphe précédent.
+	
+	
+	\subsubsection{Algorithme A*}
+	
+	\begin{myprop}
+		A* est \textit{optimal} \underline{ssi}	
+		\begin{enumerate}
+			\item Tous les coûts d'arêtes sont strictement positifs
+			\item L'heuristique $h$ est \textit{admissible}, i.e $\forall S\in\mathcal{S }_v, h(S)\le h^\star (S)$ où $h^\star$ représente le coût minimal réel restant pour aller à un état terminal
+		\end{enumerate}
+	\end{myprop}
+	
+	\begin{proof}
+		Soit $S_0\in\mathcal{S}_v$ l'état initial. Soit $S_G\in\mathcal{T}$ un état terminal atteignable depuis $S_0$, et soit $c^\star$ le coût minimal pour aller de $S_0$ à $S_G$.
+		
+		Soit $(g,h)\in\left(\mathcal{F}(\mathcal{S}_v,\mathbb{N})\right)^2$, avec pour tout $S\in\mathcal{S}_v$, $g(S)$ et $h(S)$ représente respectivement le coût exact de $S_0$ vers $S$ et l'heuristique évaluée en $S$, supposée admissible. On peut ainsi définir la fonction $f:\mathcal{S}_v\to\mathbb{N}$ telle que $f=g+h$. 
+		
+		Pour tout état $S\in\mathcal{S}_v$, on a donc :
+		\[
+		f(S) \le g(S) + h^\star(S)
+		\]
+		
+		Supposons par l’absurde que A* retourne une solution $S\in\mathcal{S}_v$ de coût $c\in\mathbb{N}$ tel que $c > c^\star$ avant d’explorer un chemin optimal.
+		Alors, il existe un état $S'\in\mathcal{S}_v$ sur un chemin optimal tel que
+		\[
+		g(S') + h(S') \le g(S') + h^\star(S') < c
+		\]
+		
+		D'où:
+		\[
+		f(S') \le c^\star < c
+		\]
+		ce qui implique que $S'$ aurait dû être extrait de la file de priorité
+		avant $S$, ce qui est absurde.
+		
+		Ainsi, le premier état terminal extrait par A* correspond nécessairement
+		à un chemin de coût minimal.
+	\end{proof}
+	
+	\paragraph{Complexité temporelle} A* ici est en $\mathcal{O}(k(n^2)^k)$. Les mêmes remarques qu'au paragraphe \ref{par:temp} s'appliquent. Néanmoins, notons qu'une bonne heuristique permet d'évincer l'exploration d'états peu intéressants.
+	
+	\paragraph{Complexité spatiale} A* occupe ici un espace en $\mathcal{O}((n^2)^k)$. Les mêmes remarques qu'au paragraphe \ref{par:spat} s'appliquent.
+	
+	\subsubsection{Heuristiques étudiées}
+	Dans cette partie, on présente plusieurs heuristiques auxquelles on pourrait penser afin de guider notre recherche dans $\mathcal{S}_v$.
+	
+	\paragraph{Heuristique nulle} Prenons pour tout $S\in\mathcal{S}_v, h(S)=0$. Cette heuristique est bien admissible car elle ne surestime pas le coût réel pour passer d'un état initial à l'état final. Néanmoins, on note qu'elle n'est pas informative et de ce fait, A* dégénère et parcours l'ensemble de l'espace d'états jusqu'à trouver la solution optimale. \textbf{Inutilisable en pratique}.
+	
+	\begin{myrem}
+		Notons toutefois qu'un parcours en largeur est un cas particulier de A* avec une heuristique nulle, et des coûts unitaires.
+	\end{myrem}
+	
+	\paragraph{Distance de Manhattan} Soit $i\in\llbracket 1;k\rrbracket$ l'indice du robot cible. Prenons pour tout $(S,g)\in\mathcal{S}_v\times G, h(S)=d_1((S)_i, g)$, avec $\begin{array}{lll}
+		d_1 : & \mathbb{R}^2\times\mathbb{R}^2 &\to\mathbb{R}^+\\
+		& ((x,y), (x',y')) &\mapsto\abs{x-x'}+\abs{y-y'}
+	\end{array}$. Cette application semble de prime abord assez naturel, cependant on rencontre rapidement un problème. Supposons que j'ai un pion à 4 cases de l'objectif, ainsi on aura $h(S)=4$ pour cet état $S$. Or, d'après $\delta$, il ne suffit que d'un coup pour arriver à l'objectif. Ainsi, elle surestime le coût réel. Donc \textbf{cette heuristique n'est pas admissible}.
+	
+	\paragraph{Heuristique naïve} Soit $i\in\llbracket 1;k\rrbracket$ l'indice du robot cible. Prenons pour tout $(S=((x_j,y_j))_{j\in\llbracket 1;k\rrbracket},(x_g,y_g))\in\mathcal{S}_v\times G, h(S) = \left\{\begin{array}{ll}
+		0 & \text{si } S\in\mathcal{T}\\
+		1 & \text{si } x_i=x_g \text{ ou } y_i=y_g\\
+		2 & \text{sinon} 
+	\end{array}\right.$. Cette heuristique est bien admissible, mais reste peu informative. Elles reste malgré tout meilleure que BFS. \textbf{Utilisable, mais peu informative}.
+	
+	\paragraph{Heuristique par "glissades"} Soit $i\in\llbracket 1;k\rrbracket$ l'indice du robot cible. Soit $g\in G$ la case d'arrivée. On construit une heuristique $h$ au début de chaque nouvelle partie à partir des règles suivantes:
+	\begin{enumerate}
+		\item On considère un plateau dénué de tous robots.
+		\item On définit la matrice $H=(\tilde{h}_{i,j})_{(i,j)\in\llbracket 1;n\rrbracket^2}\in\mathcal{M}(\mathbb{N})$ tel que pour tout $(i,j)\in\llbracket 1;n\rrbracket^2, \tilde{h}_{i,j}=\left\{\begin{array}{ll}
+			0 & \text{si } (i,j)=g\\
+			+\infty & \text{sinon}
+		\end{array}\right.$.
+		\item On note $p=(x_p,y_p)$ la case parent. On applique la fonction $\tilde{\delta}$ sur $p$ pour obtenir l'ensemble $E$ des cases atteignables depuis celle-ci. 
+        \[
+			\begin{array}{lll}
+				\tilde{\delta} :& \mathcal{S}_v\times\llbracket 1;k\rrbracket\times D &\rightarrow\mathcal{S}_v \\
+				&((r_1,\ldots,r_k),i,d)&\mapsto (r_1,\ldots,r_i+dt,\ldots,r_k)
+			\end{array}
+		\]
+        avec $t=\min \Big\{ s \in \mathbb{N}^* \;\Big|\; \{ r_i + ds, r_i + d(s+1) \} \in C \Big\}$
+        
+		\item Pour tout $c=(x,y)\in E,\; \tilde{h}_{x,y}=\tilde{h}_{x_p,y_p}+1.$
+		\item On applique les opérations 3 et 4 sur chacun des nœuds engendrés jusqu'à avoir traité tout le plateau.
+	\end{enumerate}
+	On a ainsi pour tout $S=((x_j,y_j))_{j\in\llbracket 1;k\rrbracket}\in\mathcal{S}_v,\; h(S)=\tilde{h}_{x_i,y_i}$. Autrement dit, on a effectué un parcours en largeur depuis un état terminal afin d'évaluer à combien de déplacements une case se trouve de la case finale. Cette heuristique est bien sûr admissible, et n'est calculée qu'une seule en début de partie (\textit{$\mathcal{O}(n^2)$ en création et $\theta(1)$ en accès}). \textbf{Utilisable et informative}.
+	
+	\subsubsection{Comparaisons}
 	
 	\begin{center}
-		\begin{tikzpicture}
-			\node[draw, circle] (S0) at (-1,0) {$S_0$} ;
-			\node[draw, circle] (S1) at (2,2) {$S_1$} ;
-			\node[draw, circle] (S2) at (2,-2) {$S_2$} ;
-			\node[draw, circle] (S3) at (-2,-2) {$S_3$} ;
-			\node[draw, circle] (Err) at (2,0) {$Err$} ;
-			
-			\draw (S0) to[bend right=75](-2,1);
-			\draw[->,>=latex](-2,1) to[bend right=75](S0);
-			
-			\draw[->,>=latex] (S0) edge[bend left] (S1) ;
-			\draw[->,>=latex] (S0) edge[bend right] (S2) ;
-			\draw[->,>=latex] (S0) edge (S3) ;
-			
-			\draw[->,>=latex] (S1) edge[bend left] (S0) ;
-			\draw (S1) to[bend right=75](3,3);
-			\draw[->,>=latex](3,3) to[bend right=75](S1);
-			
-			\draw[->,>=latex] (S2) edge[bend right] (S0) ;
-			\draw[->,>=latex] (S2) edge[bend right] (Err) ;
-			
-			\draw[->,>=latex] (Err) edge (S0) ;
-		\end{tikzpicture}
+		\begin{tabular}{|l|l|l|}
+			\hline
+			\textbf{Critère} & \textbf{BFS} & \textbf{A*}\\
+			\hline
+			\hline
+			\textit{Optimalité} & Oui & Si heuristique admissible\\
+			\hline
+			\textit{Temps} & $\mathcal{O}(k(n^2)^k)$ & Meilleure que BFS si $h$ bien trouvé\\
+			\hline
+			\textit{Mémoire} & Très élevée & Très élevée\\
+			\hline
+			\textit{Usage} & Petits graphes & Espaces larges avec coûts variables \\
+			\hline
+		\end{tabular}
 	\end{center}
+		
+	\subsection{Organisation du programme}
+
+    \paragraph{Fichiers} Tous les scripts Python sont localisés dans le dossier \verb|src|. Chaque classe se trouve dans son propre fichier. Le fichier \verb|consts.py| contient les constantes utilisées à travers le projet. Le fichier \verb|board.txt| contient une copie des collisions (\textit{opérations bit à bit}) des cases du plateau, avec la première case en haut à gauche. Enfin le dossier \verb|docs| contient les sources de ce rapport.
+
+    \paragraph{Moteur de jeu} Notre projet utilise \verb|pygame| pour l'interface graphique et la gestion des entrées. Le point d'entrée est à travers la fonction \verb|main| dans le fichier éponyme. Le programme fonctionne ainsi de la manière suivante:
+    \begin{enumerate}
+        \item Initialisation de la fenêtre et des événements
+        \item Initialisation des éléments de jeu (\textit{joueur, plateau, \ldots})
+        \item Boucle principale
+        \begin{enumerate}
+            \item Mise à jour des objets de jeu
+            \item Rendu à l'écran
+            \item Pause pour maintenir 60 images par secondes
+        \end{enumerate}
+        \item Fermeture de la fenêtre \& Nettoyage
+    \end{enumerate}
+
+    \paragraph{Partie de jeu} La boucle principale agit comme un automate fini simple, selon les états suivants (\textit{définis dans} \verb|consts.py|):
+    \begin{enumerate}
+        \item \textbf{Initialisation de la partie}
+        \begin{itemize}
+            \item Variables remises à zéro
+            \item Choix d'une nouvelle configuration de jeu
+            \item Pré-calcul de l'heuristique (\textit{valeurs stockées dans un dictionnaire})
+        \end{itemize}
+        \item \textbf{Tour du joueur}
+        \begin{itemize}
+            \item Le joueur doit fournir une solution en moins de 60 secondes
+        \end{itemize}
+        \item \textbf{Fin de tour du joueur}
+        \begin{itemize}
+            \item Affichage des résultats du tour
+        \end{itemize}
+        \item \textbf{Calculs de l'IA}
+        \begin{itemize}
+            \item Application de l'algorithme de recherche dans un second processus
+            \item Si aucune solution n'est trouvée en 60 secondes, alors on passe aux résultats
+        \end{itemize}
+        \item \textbf{Tour de l'IA}
+        \begin{itemize}
+            \item L'IA donne le nombre de coups qu'elle va faire
+            \item Elle affiche sa solution étape par étape
+            \item Les scores sont mis à jour ici sauf si aucune solution n'a été trouvée
+        \end{itemize}
+        \item \textbf{Affichage des résultats de partie}
+        \begin{itemize}
+            \item Affichage des scores
+            \item Retour au premier état
+        \end{itemize}
+    \end{enumerate}
+%-----------------------------------------------
+	\newpage
+	\section{Résultats}
+    
+    Nous avons ainsi testé les algorithmes (\textit{et heuristiques pour A*}) présentés en section \ref{sec:algoe}.
+    
+	\subsection{Résultats obtenus}
+
+    \paragraph{Parcours en largeur} Pour une configuration de jeu quelconque, quand bien même l'algorithme est optimal, il ne termine pas. 
+
+    \paragraph{A* avec heuristique nulle} Mêmes résultats que pour le parcours en largeur.
+
+    \paragraph{A* avec heuristique naïve} L'algorithme ne termine pas en des temps raisonnables mais reste néanmoins meilleur que BFS.
+
+    \paragraph{A* avec heuristique $d_1$} Bien que l'heuristique ne soit pas admissible, il s'agit de celle qui donne les meilleurs résultats en termes de complexité temporelle. Néanmoins, son comportement dépend fortement de la configuration. Ainsi, la solution optimale n'est pas en moyenne pas fournie. 
+
+    \paragraph{A* avec heuristique par glissements} Pour une configuration quelconque, l'algorithme met en moyenne entre 10 et 20 secondes à fournir la solution optimale. Il arrive toutefois qu'il mette plus de temps parfois (\textit{quelques minutes}).
 	
+	\subsection{Interprétation des résultats}
+	Les résultats expérimentaux obtenus confirment les analyses théoriques menées dans les sections précédentes, en particulier concernant la taille de l’espace d’états et le rôle déterminant des heuristiques dans la réduction de la complexité effective de la recherche.
+
+    \paragraph{Limites des approches non informées}
+    Le parcours en largeur, bien qu’optimal par construction, souffre d’une explosion combinatoire de l’espace d’états. Pour une configuration standard du jeu, toute exploration exhaustive reste irréaliste en pratique. A* avec l'heuristique nulle étant équivalent à BFS, il hérite strictement des mêmes limitations et ne termine pas non plus dans des délais raisonnables.
+    
+    \paragraph{Apport partiel des heuristiques naïves}
+    L’heuristique naïve introduit une première forme de guidage de la recherche, ce qui permet de réduire le nombre d’états explorés par rapport à BFS. Toutefois, cette heuristique reste trop peu informative pour compenser la taille du graphe implicite. En conséquence, l’algorithme demeure trop lent pour résoudre une instance quelconque du problème.
+    
+    \paragraph{Compromis performance/optimalité avec la distance de Manhattan}
+    L’heuristique $d_1$ se révèle être la plus efficace en pratique en termes de temps de calcul. Son coût d’évaluation constant et son pouvoir discriminant élevé permettent à A* de se concentrer rapidement sur des zones pertinentes de l’espace d’états. Cependant, cette heuristique n’étant pas admissible dans le cadre des déplacements par glissements, l’optimalité des solutions produites n’est pas garantie. De plus, les performances observées varient fortement selon la configuration initiale et la position de la cible.
+    
+    \paragraph{Heuristique par glissements}
+    L’heuristique par glissements offre le meilleur compromis entre garanties théoriques et performances pratiques. En étant admissible, elle permet à A* de conserver son optimalité tout en réduisant drastiquement l’espace de recherche (\textit{en général, on explore au plus quelques milliers d'états au lieu de milliards}). Les temps d’exécution observés, bien que significatifs, restent compatibles avec une résolution effective du problème. Les cas où le temps de calcul augmente sensiblement correspondent à des configurations particulièrement défavorables, confirmant le caractère intrinsèquement difficile du problème.
+
+    \paragraph{Utilisation de la mémoire} Notons que peu importe la technique employée, la mémoire utilisée augmente exponentiellement. Cela constitue ainsi le défaut majeur des algorithmes présentés.
+%-----------------------------------------------	
+	\newpage	
+	\section{Retour d'expérience}
+	\subsection{Organisation}
+	Nous avons utilisé \textbf{GitHub} afin de centraliser le code tout en assurant un suivi régulier du projet. Cela nous a ainsi permis de travailler sur une base commune une fois l'implémentation commencée.
+	
+	De plus, nous avons cherché à nous placer dans le contexte du travail collaboratif en entreprise, et de ce fait, nous avons travaillé par \textit{Pull Requests}. La branche \verb|main| a été ainsi protégée par défaut des téléversements non approuvés au préalable.
+
+    En terme de tâches à effectuer, nous avions réparti le travail de manière relativement équilibrée.
+	\subsection{Difficultés rencontrées}
+	En terme d'organisation, nous avons trouvé la synchronisation entre nous particulièrement difficile concernant les \textit{pull requests}. Ce n'était pas trop dérangeant pendant le semestre, mais bien plus pendant les périodes de congés. Cela a engendré du retard et des différences de quantité de travail entre les membres, qui a dû être rattrapé.
+
+    En ce qui concerne le code à produire, la fonction \verb|astar| a dû être revue, afin de prendre en compte les positions des pions du plateau et ainsi pouvoir comparer le résultat trouvé par l'ordinateur à celui trouvé par le joueur. Nous n'avions pas suffisamment conçu l'ensemble du projet pour toujours être sur la même longueur d'onde.
+
+    Il n'y a eu aucun problème technique dû à un manque de compétences en python.
+	\subsection{Suggestions d'amélioration}
+    Tout d'abord, un point négatif est la gestion de la mémoire. En effet, il aurait été préférable d'utiliser un algorithme avec un $\mathcal{O}(n)$ en mémoire. Par exemple, un parcours en profondeur a cette complexité, néanmoins elle ne fournit jamais la solution optimale. Ainsi, peut-être pourrions-nous essayer d'élaguer certaines branches d'une exploration en profondeur en se basant sur le principe de l'heuristique ?
+    
+
+    Il est également à noter que nous n'avons pas permis à l'utilisateur de changer le niveau de difficulté de l'IA. En effet, comme le problème revient à trouver l'existence d'une solution, il y aurait alors un choix à faire:
+    \begin{itemize}
+        \item Soit on considère le temps d'exécution comme niveau de difficulté (\textit{plus l'IA est rapide, plus elle est dure})
+        \item Soit on considère l'optimalité de la solution
+    \end{itemize}
+    Cela revient en somme à jouer sur l'heuristique employée dans A*. Nous avons ainsi décidé que ce point était inutile.
+    
+%-----------------------------------------------
+	\newpage	
+	\section{Conclusion}
+    
+	Les résultats obtenus mettent en évidence que, pour le jeu \textit{Rasende Roboter}, la faisabilité algorithmique repose essentiellement sur la qualité de l’heuristique utilisée. Les approches non informées sont rapidement dépassées par la taille de l’espace d’états, tandis que des heuristiques bien conçues permettent de rendre le problème tractable en pratique, au prix éventuel de l’abandon de l’optimalité ou d’un coût de calcul supplémentaire.
+
+    Cependant, ce problème déterministe en soulève un second. Que se passe-t-il si on considère une grille générée aléatoirement ? A-t-on nécessairement l'existence d'au moins une solution pour une instance donnée ? Ainsi, cela constitue un problème très compliqué.
 \end{document}
