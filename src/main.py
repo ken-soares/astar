@@ -129,7 +129,7 @@ def run(window : pg.Surface):
 
                             if ai_future is not None and ai_future.done():
                                 ai_move_sequence = ai_future.result()  # result is safe to use in main thread
-                                ai_moves = len(ai_move_sequence) 
+                                ai_moves = len(ai_move_sequence) - 1
                                 ai_future = None
                                 game_state = c.STATE_COMPUTER_TURN
                         else:
