@@ -4,7 +4,8 @@ NB_CELLS = 16
 
 # Window constants
 WINDOW_SIZE = CELL_SIZE * NB_CELLS
-WINDOW_TITLE = "A*"
+WINDOW_GUI_HEIGHT = 150
+WINDOW_TITLE = "Rasende Roboter"
 
 # Color definitions
 BLACK = (0, 0, 0)
@@ -40,7 +41,7 @@ MOVE_LEFT = 3
 MOVE_RIGHT = 4
 
 # Player decision time (in seconds)
-DECISION_TIME = 30
+DECISION_TIME = 60
 
 # Pawn ids
 RED_ID = 1
@@ -65,4 +66,11 @@ PAWN_GOAL_COORDS = {
     YELLOW_ID: [(1,3),(4,9),(10,7),(9,12)]
 }
 PAWN_NUMBER = 4
-PAWN_SIZE = CELL_SIZE // 2.5
+
+# Game states
+STATE_INITIALIZING = 0
+STATE_PLAYER_TURN = 1
+STATE_PLAYER_END = 2
+STATE_COMPUTER_CALCULATING = 3
+STATE_COMPUTER_TURN = 4
+STATE_RESULTS = 5

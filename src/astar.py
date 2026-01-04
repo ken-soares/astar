@@ -1,44 +1,34 @@
 import math
 import heapq
 
+import consts as c
+
 from board import Board
 
-# This function might be moved to board.py later
-def get_neighbors(board: Board, current: tuple[int, int]) -> list[tuple[int, int]]:
-    neighbors = []
+def get_neighbors(board : Board, state : tuple) -> list[tuple]:
+    neighbors : list = []
 
-    x, y = current
-    size = board.size
-    cell = board.grid[y][x]
+    # For each pawn, try each possible move
+    for pawn_id in range(1, c.PAWN_NUMBER + 1):
+        for direction in [c.MOVE_UP, c.MOVE_DOWN, c.MOVE_LEFT, c.MOVE_RIGHT]:
+            board.clear_pawns()
 
-    # Up
-    if y > 0 and not cell.collide_up:
-        neighbor_cell = board.grid[y - 1][x]
-        # Check reciprocal collision
-        if not neighbor_cell.collide_down:
-            neighbors.append((x, y - 1))
-    # Down
-    if y < size - 1 and not cell.collide_down:
-        neighbor_cell = board.grid[y + 1][x]
-        # Check reciprocal collision
-        if not neighbor_cell.collide_up:
-            neighbors.append((x, y + 1))
-    # Left
-    if x > 0 and not cell.collide_left:
-        neighbor_cell = board.grid[y][x - 1]
-        # Check reciprocal collision
-        if not neighbor_cell.collide_right:
-            neighbors.append((x - 1, y))
-    # Right
-    if x < size - 1 and not cell.collide_right:
-        neighbor_cell = board.grid[y][x + 1]
-        # Check reciprocal collision
-        if not neighbor_cell.collide_left:
-            neighbors.append((x + 1, y))
+            # Set pawns positions according to the current state
+            for i in range(c.PAWN_NUMBER):
+                x, y = state[i]
+                board.set_cell_value(x, y, i + 1)
 
-    return neighbors # List of near coordinates that can be reached from current
+            if board.move_pawn(pawn_id, direction):
+                # If move is successful, record new state
+                new_pawns : list = []
+                for i in range(c.PAWN_NUMBER):
+                    new_pawns.append(board.get_pawn(i + 1))
 
-def reconstruct_path(closed: dict, current: tuple[int, int]) -> list[tuple[int, int]]:
+                neighbors.append(tuple(new_pawns))
+
+    return neighbors
+
+def reconstruct_path(closed : dict, current : tuple) -> list[tuple]:
     total_path = [current]
 
     while current in closed:
@@ -50,55 +40,58 @@ def reconstruct_path(closed: dict, current: tuple[int, int]) -> list[tuple[int, 
 
     return total_path
 
-def heuristic(a: list[int], b: list[int]) -> int:
-    # Distance of norm 1 on IR² -> d1(U,V) = |Ux - Vx| + |Uy - Vy|
-    # * Positivity: d1(U,V) = 0 iff U = V
-    # * Symmetry: d1(U,V) = d1(V,U)
-    # * Triangle inequality: d1(U,W) <= d1(U,V) + d1(V,W)
-    # Used because only 4 directions are allowed
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+def astar(board : Board, h_score : dict, stop_event=None) -> list[tuple]:
+    goal_pos : tuple[int, int] = board.get_goal()
+    goal_id : int = board.get_goal_color()
+    goal_index : int = goal_id - 1
 
-def astar(board: Board, src: list[int], dest: list[int]) -> list[tuple[int, int]]:
-    size = board.size
+    # Initial state: positions of all pawns (node is a tuple of pawn coords)
+    pawns : list = []
+    for i in range(c.PAWN_NUMBER):
+        pawns.append(board.get_pawn(i + 1))
+
+    state = tuple(pawns)
 
     # Open list used as a priority queue
-    open_list = []
-    heapq.heappush(open_list, (0, tuple(src)))
+    open_list : list = []
+    heapq.heappush(open_list, (0, state))
 
     # Dictionary of navigated nodes
-    closed_set = {}
+    closed_set : dict = {}
 
-    # Dictionary for the cost of a node
-    g_score = { (x, y): math.inf for x in range(size) for y in range(size) }
-    g_score[tuple(src)] = 0
+    # Dictionary for the cost of a node (g) and total estimated cost (f)
+    g_score : dict = {} # If not in dict, value is infinity
+    g_score[state] = 0
 
-    # Dictionary for the total estimated cost of a node (f = g + h)
-    f_score = { (x, y): math.inf for x in range(size) for y in range(size) }
-    f_score[tuple(src)] = heuristic(src, dest)
+    f_score : dict = {}
+    f_score[state] = h_score.get(state[goal_index], math.inf)
 
     # While there are still nodes to explore
     while open_list:
-        current = heapq.heappop(open_list)[1]
+        if stop_event and stop_event.is_set():
+            return []
+        
+        current_state : tuple = heapq.heappop(open_list)[1]
 
-        # Goal is reached
-        if current == tuple(dest):
-            return reconstruct_path(closed_set, current)
-            
+        # Goal is reached when the goal pawn is at the goal position
+        if current_state[goal_index] == goal_pos:
+            board.load_initial_state()
+            return reconstruct_path(closed_set, current_state)
         # Get reachable neighbors
-        neighbors = get_neighbors(board, current)
+        next_states = get_neighbors(board, current_state)
 
         # Explore each neighbor and find the lowest cost path
-        for neighbor in neighbors:
-            tentative_g_score = g_score[current] + 1
+        for ns in next_states:
+            tentative_g_score : int = g_score.get(current_state, math.inf) + 1
 
             # If the best path has been found
-            if tentative_g_score < g_score[neighbor]:
-                closed_set[neighbor] = current
-                g_score[neighbor] = tentative_g_score
-                f_score[neighbor] = tentative_g_score + heuristic(list(neighbor), dest)
+            if tentative_g_score < g_score.get(ns, math.inf):
+                closed_set[ns] = current_state
+                g_score[ns] = tentative_g_score
+                f_score[ns] = tentative_g_score + h_score.get(ns[goal_index], math.inf)
 
                 # Add neighbor to open list if not already present
-                if neighbor not in [i[1] for i in open_list]:
-                    heapq.heappush(open_list, (f_score[neighbor], neighbor))
-    
+                if ns not in [i[1] for i in open_list]:
+                    heapq.heappush(open_list, (f_score[ns], ns))
+
     return []  # No path found
